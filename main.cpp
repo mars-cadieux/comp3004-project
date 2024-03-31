@@ -2,7 +2,7 @@
 
 #include <QApplication>
 
-//test comment - mars
+//test comment
 
 int main(int argc, char *argv[])
 {
