@@ -2,6 +2,8 @@
 
 #include <QApplication>
 
+//test comment - mars
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
