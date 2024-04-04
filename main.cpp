@@ -2,7 +2,7 @@
 
 #include <QApplication>
 
-//test comment avery
+//test comment
 
 int main(int argc, char *argv[])
 {
