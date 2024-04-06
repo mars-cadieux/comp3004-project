@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->powerButton , &QPushButton::clicked, this, &MainWindow::handlePowerButton);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::handleStartButton);
     connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::handleStopButton);
+    connect(ui->selectButton, &QPushButton::clicked, this, &MainWindow::handleSelectButton);
 }
 
 MainWindow::~MainWindow()
@@ -82,5 +83,11 @@ void MainWindow::handleStopButton(){
     //functionality
     qInfo()<< "stop button pressed";
     emit stopButtonPressed();
+}
+
+void MainWindow::handleSelectButton(){
+    //functionality
+    qInfo()<< "select button pressed";
+    emit selectButtonPressed();
 }
 

@@ -19,6 +19,7 @@ void Controller::launch(){
     QObject::connect(&w, &MainWindow::powerButtonPressed, &neureset, &Neureset::powerButtonPressed);
     QObject::connect(&w, &MainWindow::startButtonPressed, &neureset, &Neureset::startButtonPressed);
     QObject::connect(&w, &MainWindow::stopButtonPressed, &neureset, &Neureset::stopButtonPressed);
+    QObject::connect(&w, &MainWindow::selectButtonPressed, &neureset, &Neureset::selectButtonPressed);
 
     w.show();
 }

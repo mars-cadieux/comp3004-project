@@ -21,6 +21,7 @@ public slots:
     void powerButtonPressed();
     void startButtonPressed();
     void stopButtonPressed();
+    void selectButtonPressed();
 
 private:
     EEGHeadset headset;

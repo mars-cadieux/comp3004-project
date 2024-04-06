@@ -26,6 +26,7 @@ signals:
     void powerButtonPressed();
     void startButtonPressed();
     void stopButtonPressed();
+    void selectButtonPressed();
 
 
 private slots:
@@ -36,8 +37,8 @@ private slots:
     void handlePowerButton();
     void handleStartButton();
     void handleStopButton();
+    void handleSelectButton();
 
 
-    void on_navigateDown_released();
 };
 #endif // MAINWINDOW_H
