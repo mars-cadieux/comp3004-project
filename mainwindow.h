@@ -18,6 +18,15 @@ public:
 private:
     Ui::MainWindow *ui;
 
+signals:
+    void menuButtonPressed();
+    void downButtonPressed();
+    void upButtonPressed();
+    void pauseButtonPressed();
+    void powerButtonPressed();
+    void startButtonPressed();
+    void stopButtonPressed();
+
 
 private slots:
     void handleMenuButton();
@@ -29,5 +38,6 @@ private slots:
     void handleStopButton();
 
 
+    void on_navigateDown_released();
 };
 #endif // MAINWINDOW_H

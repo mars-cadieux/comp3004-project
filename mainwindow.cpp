@@ -24,35 +24,42 @@ MainWindow::~MainWindow()
 void MainWindow::handleMenuButton(){
     //functionality
     qInfo()<< "menu button pressed";
+    emit menuButtonPressed();
 }
 
 void MainWindow::handleNavigateDown(){
     //functionality
     qInfo()<< "navigate down button pressed";
+    emit downButtonPressed();
 }
 
 void MainWindow::handleNavigateUp(){
     //functionality
     qInfo()<< "navigate up button pressed";
+    emit upButtonPressed();
 }
 
 void MainWindow::handlePauseButton(){
     //functionality
     qInfo()<< "pause button pressed";
+    emit pauseButtonPressed();
 }
 
 void MainWindow::handlePowerButton(){
     //functionality
     qInfo()<< "power button pressed";
+    emit powerButtonPressed();
 }
 
 void MainWindow::handleStartButton(){
     //functionality
     qInfo()<< "start button pressed";
+    emit startButtonPressed();
 }
 
 void MainWindow::handleStopButton(){
     //functionality
     qInfo()<< "stop button pressed";
+    emit stopButtonPressed();
 }
 

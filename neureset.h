@@ -11,6 +11,15 @@ class Neureset: public QObject
 public:
     Neureset();
 
+public slots:
+    void menuButtonPressed();
+    void downButtonPressed();
+    void upButtonPressed();
+    void pauseButtonPressed();
+    void powerButtonPressed();
+    void startButtonPressed();
+    void stopButtonPressed();
+
 private:
     void startSession();
     float measureBaseline;
