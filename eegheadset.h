@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class EEGHeadset
+class EEGHeadset: public QObject
 {
     Q_OBJECT
 public:
@@ -11,8 +11,8 @@ public:
 
 private:
 
-public slots:
-    void measureFrequency();
+//public slots:
+    //void measureFrequency();
 
 signals:
     void sendHz();

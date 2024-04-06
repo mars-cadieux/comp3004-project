@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class Electrode
+class Electrode: public QObject
 {
     Q_OBJECT
 public:
