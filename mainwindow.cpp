@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 {
     ui->setupUi(this);
     ui->sessionFrame->setVisible(false);
+    ui->mainMenu->setCurrentRow(0);
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);
     connect(ui->navigateDown, &QPushButton::clicked, this, &MainWindow::handleNavigateDown);
@@ -23,18 +24,38 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleMenuButton(){
     //functionality
+    qInfo(ui->mainMenu->currentItem()->data(Qt::DisplayRole).toString().toStdString().c_str()); // Prints the name of the currently selected menu option
+
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
 
 void MainWindow::handleNavigateDown(){
     //functionality
+    if(ui->mainMenu->currentRow() == ui->mainMenu->count() - 1)
+    {
+        ui->mainMenu->setCurrentRow(0); // Resets the menu selection back to the top
+    }
+    else
+    {
+        ui->mainMenu->setCurrentRow(ui->mainMenu->currentRow() + 1);
+    }
+
     qInfo()<< "navigate down button pressed";
     emit downButtonPressed();
 }
 
 void MainWindow::handleNavigateUp(){
     //functionality
+    if(ui->mainMenu->currentRow() == 0)
+    {
+        ui->mainMenu->setCurrentRow(ui->mainMenu->count() - 1);  // Resets the menu selection back to the bottom
+    }
+    else
+    {
+        ui->mainMenu->setCurrentRow(ui->mainMenu->currentRow() - 1);
+    }
+
     qInfo()<< "navigate up button pressed";
     emit upButtonPressed();
 }
