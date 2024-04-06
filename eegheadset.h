@@ -2,6 +2,7 @@
 #define EEGHEADSET_H
 
 #include "electrode.h"
+#include "electrodethread.h"
 
 #include <QObject>
 
@@ -15,9 +16,10 @@ public:
 
 private:
     std::vector<Electrode*> electrodes;
+    std::vector<float> frequencies;
 
-//public slots:
-    //void measureFrequency();
+public slots:
+    void handleResults(qfloat16 freq); //handle results of the electrode thread
 
 signals:
     void sendHz();

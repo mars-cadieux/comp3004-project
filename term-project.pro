@@ -12,6 +12,7 @@ SOURCES += \
     controller.cpp \
     eegheadset.cpp \
     electrode.cpp \
+    electrodethread.cpp \
     main.cpp \
     mainwindow.cpp \
     neureset.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     defs.h \
     eegheadset.h \
     electrode.h \
+    electrodethread.h \
     mainwindow.h \
     neureset.h \
     session.h

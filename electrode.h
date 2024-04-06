@@ -8,14 +8,17 @@ class Electrode: public QObject
     Q_OBJECT
 public:
     Electrode();
+    float receiveBrainwave();
 
 private:
     void attach();
-    void applyOffsetFrequency(float frequency);
-    void receiveBrainwave(float frequency);
+    void applyOffsetFrequency(float frequency); //why is this private? I think it should either be public or it should be a slot. open to discussion ofc. - mars
+
 
 signals:
     void sendBrainwave();
+
+
 };
 
 #endif // ELECTRODE_H
