@@ -5,6 +5,14 @@ Neureset::Neureset()
 
 }
 
+Neureset::~Neureset()
+{
+    for(unsigned int i=0; i<sessions.size(); ++i){
+        delete sessions[i];
+    }
+    sessions.clear();
+}
+
 
 void Neureset::menuButtonPressed(){
     qInfo("menuButtonPressed from neureset class");

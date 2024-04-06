@@ -14,14 +14,16 @@ SOURCES += \
     electrode.cpp \
     main.cpp \
     mainwindow.cpp \
-    neureset.cpp
+    neureset.cpp \
+    session.cpp
 
 HEADERS += \
     controller.h \
     eegheadset.h \
     electrode.h \
     mainwindow.h \
-    neureset.h
+    neureset.h \
+    session.h
 
 FORMS += \
     mainwindow.ui
