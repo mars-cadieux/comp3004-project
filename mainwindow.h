@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QThread>
+#include "neureset.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,9 +16,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void updateWindow();
 
 private:
     Ui::MainWindow *ui;
+    Neureset* neureset;
+    QThread* windowThread;
 
 signals:
     void menuButtonPressed();
@@ -28,7 +33,6 @@ signals:
     void stopButtonPressed();
     void selectButtonPressed();
 
-
 private slots:
     void handleMenuButton();
     void handleNavigateDown();
@@ -37,8 +41,11 @@ private slots:
     void handlePowerButton();
     void handleStartButton();
     void handleStopButton();
+<<<<<<< Updated upstream
     void handleSelectButton();
 
 
+=======
+>>>>>>> Stashed changes
 };
 #endif // MAINWINDOW_H
