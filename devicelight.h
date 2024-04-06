@@ -1,6 +1,7 @@
 #ifndef DEVICELIGHT_H
 #define DEVICELIGHT_H
 
+#import <QThread>
 
 class DeviceLight
 {
@@ -13,6 +14,7 @@ public:
 private:
     bool lit;
     bool flashing;
+    QThread* flashThread;
 };
 
 #endif // DEVICELIGHT_H

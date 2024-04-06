@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->setupUi(this);
     ui->sessionFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
+    neureset = new Neureset();
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);
     connect(ui->navigateDown, &QPushButton::clicked, this, &MainWindow::handleNavigateDown);
@@ -16,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::handleStartButton);
     connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::handleStopButton);
     connect(ui->selectButton, &QPushButton::clicked, this, &MainWindow::handleSelectButton);
+
+    windowThread = QThread::create([this]{ updateWindow(); });
+    windowThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -89,5 +93,12 @@ void MainWindow::handleSelectButton(){
     //functionality
     qInfo()<< "select button pressed";
     emit selectButtonPressed();
+}
+
+void MainWindow::updateWindow(){
+    while(windowThread->isRunning())
+    {
+        ui->connectionLight->setChecked(neureset->getConnLight()->isLit());
+    }
 }
 

@@ -2,7 +2,7 @@
 
 Neureset::Neureset()
 {
-
+    connectionLight = new DeviceLight();
 }
 
 Neureset::~Neureset()
@@ -58,4 +58,9 @@ void Neureset::startSession()
     //do the treatment
     float baselineAfter = headset.measureBaseline();
     currSession->setBaselineAfter(baselineAfter);
+}
+
+DeviceLight* Neureset::getConnLight()
+{
+    return connectionLight;
 }

@@ -2,7 +2,11 @@
 
 DeviceLight::DeviceLight()
 {
+    flashThread = QThread::create([this]{ updateLight(); });
+    flashThread->start();
 
+    lit = true;
+    flashing = false;
 }
 
 void DeviceLight::startFlashing()
@@ -16,7 +20,20 @@ void DeviceLight::stopFlashing()
 
 void DeviceLight::updateLight()
 {
-    // Do nothing for now (Will be used to update the light so it goes from lit to unlit when flashing)
+
+    while(flashThread->isRunning())
+    {
+        if(flashing)
+        {
+            lit = !lit;
+        }
+        else
+        {
+            lit = true;
+        }
+
+        flashThread->sleep(1);
+    }
 }
 
 bool DeviceLight::isLit()
