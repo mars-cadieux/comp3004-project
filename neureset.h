@@ -23,10 +23,11 @@ public slots:
     void stopButtonPressed();
 
 private:
+    EEGHeadset headset;
     std::vector<Session*> sessions;
 
     void startSession();
-    float measureBaseline;
+    float measureBaseline();
     void startTreatment(Electrode electrode);
     void baseLineCalculated();
     void treatmentStarted();

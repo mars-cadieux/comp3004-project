@@ -19,6 +19,7 @@ SOURCES += \
 
 HEADERS += \
     controller.h \
+    defs.h \
     eegheadset.h \
     electrode.h \
     mainwindow.h \

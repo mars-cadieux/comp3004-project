@@ -43,3 +43,15 @@ void Neureset::startButtonPressed(){
 void Neureset::stopButtonPressed(){
     qInfo("stopButtonPressed from neureset class");
 }
+
+void Neureset::startSession()
+{
+    Session* currSession = new Session(this);
+    sessions.push_back(currSession);
+
+    float baselineBefore = headset.measureBaseline();
+    currSession->setBaselineBefore(baselineBefore);
+    //do the treatment
+    float baselineAfter = headset.measureBaseline();
+    currSession->setBaselineAfter(baselineAfter);
+}
