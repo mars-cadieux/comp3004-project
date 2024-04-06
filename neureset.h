@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "eegheadset.h"
-#include "Electrode.h"
+#include "electrode.h"
 
 class Neureset: public QObject
 {

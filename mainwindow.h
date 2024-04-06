@@ -17,5 +17,17 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+
+private slots:
+    void handleMenuButton();
+    void handleNavigateDown();
+    void handleNavigateUp();
+    void handlePauseButton();
+    void handlePowerButton();
+    void handleStartButton();
+    void handleStopButton();
+
+
 };
 #endif // MAINWINDOW_H
