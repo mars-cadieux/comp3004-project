@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     controller.cpp \
+    devicelight.cpp \
     eegheadset.cpp \
     electrode.cpp \
     electrodethread.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 HEADERS += \
     controller.h \
     defs.h \
+    devicelight.h \
     eegheadset.h \
     electrode.h \
     electrodethread.h \
