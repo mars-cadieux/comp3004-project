@@ -13,6 +13,7 @@ class Neureset: public QObject
 public:
     Neureset();
     ~Neureset();
+    void setDateTime(QDate, QTime);
 
 public slots:
     void menuButtonPressed();
@@ -29,6 +30,8 @@ private:
     EEGHeadset headset;
     std::vector<Session*> sessions;
     DeviceLight* connectionLight;
+    QDate date;
+    QTime time;
 
     void startSession();
     float measureBaseline();

@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 {
     ui->setupUi(this);
     ui->sessionFrame->setVisible(false);
+    ui->dateFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
     neureset = new Neureset();
 
@@ -29,8 +30,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleMenuButton(){
     //functionality
-    qInfo(ui->mainMenu->currentItem()->data(Qt::DisplayRole).toString().toStdString().c_str()); // Prints the name of the currently selected menu option
-
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
@@ -91,6 +90,41 @@ void MainWindow::handleStopButton(){
 
 void MainWindow::handleSelectButton(){
     //functionality
+    std::string selection = ui->mainMenu->currentItem()->data(Qt::DisplayRole).toString().toStdString();
+
+    if(selection == "NEW SESSION")
+    {
+        ui->sessionFrame->setVisible(true);
+    }
+    else if(selection == "SESSION LOG")
+    {
+        ui->mainMenu->clear();
+        ui->mainMenu->addItem("UPLOAD");
+        ui->mainMenu->addItem("BACK");
+        ui->mainMenu->setCurrentRow(0);
+    }
+    else if(selection == "TIME AND DATE")
+    {
+        ui->mainMenu->clear();
+        ui->mainMenu->addItem("CONFIRM");
+        ui->mainMenu->setCurrentRow(0);
+        ui->dateFrame->setVisible(true);
+    }
+    else if(selection == "BACK" || selection == "CONFIRM")
+    {
+        ui->mainMenu->clear();
+        ui->mainMenu->addItem("NEW SESSION");
+        ui->mainMenu->addItem("SESSION LOG");
+        ui->mainMenu->addItem("TIME AND DATE");
+        ui->mainMenu->setCurrentRow(0);
+
+        if(selection == "CONFIRM")
+        {
+            neureset->setDateTime(ui->dateTimeEdit->date(), ui->dateTimeEdit->time());
+            ui->dateFrame->setVisible(false);
+        }
+    }
+
     qInfo()<< "select button pressed";
     emit selectButtonPressed();
 }

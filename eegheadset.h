@@ -1,25 +1,24 @@
 #ifndef EEGHEADSET_H
 #define EEGHEADSET_H
 
-#include "electrode.h"
-#include "electrodethread.h"
-
 #include <QObject>
-
-class EEGHeadset: public QObject
+#include "electrode.h"
+#include <QVector>
+class EEGHeadset : public QObject
 {
     Q_OBJECT
 public:
     explicit EEGHeadset(QObject *parent = nullptr);
     ~EEGHeadset();
+    //Signal processing
+    void measureFrequency();
     float measureBaseline();
 
 private:
-    std::vector<Electrode*> electrodes;
-    std::vector<float> frequencies;
-
-public slots:
-    void handleResults(qfloat16 freq); //handle results of the electrode thread
+    QVector<Electrode*> electrodes;
+    //Fixed size frequencies, changes can be made and discussed
+    float frequenciesHz[7][4];
+    float dominantFrequencies[7];
 
 signals:
     void sendHz();

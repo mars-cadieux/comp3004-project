@@ -64,3 +64,10 @@ DeviceLight* Neureset::getConnLight()
 {
     return connectionLight;
 }
+
+void Neureset::setDateTime(QDate newDate, QTime newTime)
+{
+    date = newDate;
+    time = newTime;
+    qInfo(date.toString().toStdString().c_str());
+}

@@ -1,50 +1,52 @@
 #include "eegheadset.h"
-#include "defs.h"
-
-#include <QFloat16>
 
 EEGHeadset::EEGHeadset(QObject *parent)
     : QObject{parent}
 {
-    for(int i=0; i<NUM_ELECTRODES; ++i){
-        Electrode* electrode = new Electrode();
-        electrodes.push_back(electrode);
-    }
+//Create electrodes here from the main branch
 }
 
 EEGHeadset::~EEGHeadset()
 {
-    for(unsigned int i=0; i<electrodes.size(); ++i){
-        delete electrodes[i];
-    }
-    electrodes.clear();
+//Clear electrodes here from the main branch
 }
 
-float EEGHeadset::measureBaseline()
+//Signal processing AND calculating dominant frequency from the signals.
+//Stores the hz for each electrode, and dominant frequency
+void EEGHeadset::measureFrequency()
 {
+    for (int i = 0; i < electrodes.size(); i++) {
+        QVector<Sinewave> brainwave = electrodes[i]->receiveBrainwave();
 
-    //loop through all electrodes, start work in a thread, store return values in a vector and then calculate average. return average
-    for(unsigned int i=0; i<electrodes.size(); ++i){
-        ElectrodeThread* eThread = new ElectrodeThread(this, electrodes[i]);
-        QObject::connect(eThread, &ElectrodeThread::resultReady, this, &EEGHeadset::handleResults);
-        QObject::connect(eThread, &ElectrodeThread::finished, eThread, &QObject::deleteLater);
+        //Necessary for the dominant frequency formula posted on neureset testing
+        float sumsSquared = 0.0;
+        float weightedFrequencySum = 0.0;
+
+        for (int j = 0; j < 4; j++) {
+            //"Processing" the signal from frequency to hz, and grabbing the amplitude for the dominant frequency formula
+            float frequencyHz = brainwave[j].frequency;
+            float amplitude = brainwave[j].amplitude;
+
+            //Storing the hz for each band
+            frequenciesHz[i][j] = frequencyHz;
+
+            //Calculations for dominant frequency formula
+            sumsSquared += amplitude * amplitude;
+            weightedFrequencySum += frequencyHz * amplitude * amplitude;
+        }
+        //Storing the dominant frequencies
+        dominantFrequencies[i] = weightedFrequencySum / sumsSquared;
     }
-
-    //I didn't set this up very well, with the way I did the threading we now can't return the average from within this function. will need some time to think of how to refactor this
-
-    float avg = 0.0; //placeholder for now
-    return avg;
 }
+//Finds the average of the dominant frequencies
+float EEGHeadset::measureBaseline() {
+    measureFrequency();
+    float sum = 0.0;
 
-void EEGHeadset::handleResults(qfloat16 freq)
-{
-    float convertedFreq;
-    //convert the qfloat to a regular float
-    //again, unsure if I'm using the third parameter correctly
-    qFloatFromFloat16(&convertedFreq, &freq, 16);
-
-    frequencies.push_back(convertedFreq);
-    if(frequencies.size() == NUM_ELECTRODES){
-        //calculate average and somehow return it
+    //Can modify this for more dynamic number of electrodes
+    for (int i = 0; i < 7; i++) {
+        sum += dominantFrequencies[i];
     }
+    float overallBaseline = sum / 7;
+    return overallBaseline;
 }

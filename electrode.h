@@ -2,23 +2,33 @@
 #define ELECTRODE_H
 
 #include <QObject>
+#include <QVector>
 
-class Electrode: public QObject
+//Structure for the sine wave, including frequency and amplitude.
+//Changes to be made in the future if sine waves need more detail?
+struct Sinewave {
+    float frequency;
+    float amplitude;
+};
+
+class Electrode : public QObject
 {
     Q_OBJECT
+
 public:
     Electrode();
-    float receiveBrainwave();
+    QVector<Sinewave> receiveBrainwave();
+	void applyOffsetFrequency(float frequency);
 
 private:
     void attach();
-    void applyOffsetFrequency(float frequency); //why is this private? I think it should either be public or it should be a slot. open to discussion ofc. - mars
-
+    QVector<Sinewave> brainwave;
 
 signals:
-    void sendBrainwave();
+    void sendBrainwave(QVector<Sinewave> brainwave);
 
-
+public slots:
+    void applyOffsetFrequency(float frequency);
 };
 
 #endif // ELECTRODE_H
