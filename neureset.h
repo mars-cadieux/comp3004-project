@@ -2,6 +2,8 @@
 #define NEURESET_H
 
 #include <QObject>
+#include <QVector>
+
 #include "eegheadset.h"
 #include "electrode.h" //I don't think the neureset should have direct access to the electrodes, the headset should be a mediator between the two and the neureset shouldn't be aware of the electrodes existence. open to discussion though ofc. -mars
 #include "session.h"
@@ -15,6 +17,9 @@ public:
     ~Neureset();
     void setDateTime(QDate, QTime);
 
+signals:
+    void uploadData(QVector<Session*> sessions);
+
 public slots:
     void menuButtonPressed();
     void downButtonPressed();
@@ -26,10 +31,11 @@ public slots:
     void selectButtonPressed();
     DeviceLight* getConnLight();
     float getBattery();
+    void receiveDataRequest();
 
 private:
     EEGHeadset headset;
-    std::vector<Session*> sessions;
+    QVector<Session*> sessions;
     DeviceLight* connectionLight;
     QDate date;
     QTime time;

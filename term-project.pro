@@ -17,6 +17,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     neureset.cpp \
+    pcsoftware.cpp \
+    pcui.cpp \
     session.cpp
 
 HEADERS += \
@@ -28,10 +30,13 @@ HEADERS += \
     electrodethread.h \
     mainwindow.h \
     neureset.h \
+    pcsoftware.h \
+    pcui.h \
     session.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    pcui.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

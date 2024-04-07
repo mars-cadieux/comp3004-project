@@ -3,6 +3,7 @@
 
 #include "neureset.h"
 #include "mainwindow.h"
+#include "pcsoftware.h"
 
 #include <QObject>
 
@@ -18,6 +19,7 @@ signals:
 
 private:
     Neureset neureset;
+    PCSoftware pcSoft;
     MainWindow w;
 
 };

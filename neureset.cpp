@@ -8,7 +8,7 @@ Neureset::Neureset()
 
 Neureset::~Neureset()
 {
-    for(unsigned int i=0; i<sessions.size(); ++i){
+    for(int i=0; i<sessions.size(); ++i){
         delete sessions[i];
     }
     sessions.clear();
@@ -39,6 +39,8 @@ void Neureset::powerButtonPressed(){
 
 void Neureset::startButtonPressed(){
     qInfo("startButtonPressed from neureset class");
+    //add handling so that this function only starts the session if "new session" is currenlt selected
+    startSession();
 }
 
 void Neureset::stopButtonPressed(){
@@ -51,14 +53,17 @@ void Neureset::selectButtonPressed(){
 
 void Neureset::startSession()
 {
+    qInfo("in startSession"); //debugging
     Session* currSession = new Session(this);
-    sessions.push_back(currSession);
+    sessions.push_back(currSession)
 
     float baselineBefore = headset.measureBaseline();
     currSession->setBaselineBefore(baselineBefore);
     //do the treatment
     float baselineAfter = headset.measureBaseline();
     currSession->setBaselineAfter(baselineAfter);
+
+    currSession->print();
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -76,4 +81,9 @@ void Neureset::setDateTime(QDate newDate, QTime newTime)
 float Neureset::getBattery()
 {
     return battery;
+}
+
+void Neureset::receiveDataRequest()
+{
+    emit uploadData(sessions);
 }
