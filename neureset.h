@@ -25,6 +25,7 @@ public slots:
     void stopButtonPressed();
     void selectButtonPressed();
     DeviceLight* getConnLight();
+    float getBattery();
 
 private:
     EEGHeadset headset;
@@ -32,6 +33,7 @@ private:
     DeviceLight* connectionLight;
     QDate date;
     QTime time;
+    float battery;
 
     void startSession();
     float measureBaseline();

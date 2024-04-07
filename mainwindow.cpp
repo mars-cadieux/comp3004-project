@@ -133,6 +133,7 @@ void MainWindow::updateWindow(){
     while(windowThread->isRunning())
     {
         ui->connectionLight->setChecked(neureset->getConnLight()->isLit());
+        ui->batteryBar->setValue(neureset->getBattery());
     }
 }
 

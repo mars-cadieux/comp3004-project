@@ -3,6 +3,7 @@
 Neureset::Neureset()
 {
     connectionLight = new DeviceLight();
+    battery = 100;
 }
 
 Neureset::~Neureset()
@@ -70,4 +71,9 @@ void Neureset::setDateTime(QDate newDate, QTime newTime)
     date = newDate;
     time = newTime;
     qInfo(date.toString().toStdString().c_str());
+}
+
+float Neureset::getBattery()
+{
+    return battery;
 }
