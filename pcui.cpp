@@ -8,8 +8,9 @@ PCui::PCui(QWidget *parent, PCSoftware* owner) :
     ui(new Ui::PCui)
 {
     this->owner = owner;
-    QWidget::setWindowTitle("PCui");
+
     ui->setupUi(this);
+    QWidget::setWindowTitle("PCui");
 }
 
 PCui::~PCui()

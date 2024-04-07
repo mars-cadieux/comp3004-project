@@ -55,7 +55,7 @@ void Neureset::startSession()
 {
     qInfo("in startSession"); //debugging
     Session* currSession = new Session(this);
-    sessions.push_back(currSession)
+    sessions.push_back(currSession);
 
     float baselineBefore = headset.measureBaseline();
     currSession->setBaselineBefore(baselineBefore);
