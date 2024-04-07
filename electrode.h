@@ -26,9 +26,6 @@ private:
 
 signals:
     void sendBrainwave(QVector<Sinewave> brainwave);
-
-public slots:
-    void applyOffsetFrequency(float frequency);
 };
 
 #endif // ELECTRODE_H
