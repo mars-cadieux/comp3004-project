@@ -22,6 +22,7 @@ private:
     Ui::MainWindow *ui;
     Neureset* neureset;
     QThread* windowThread;
+    bool power = true;
 
 signals:
     void menuButtonPressed();

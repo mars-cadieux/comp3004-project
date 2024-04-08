@@ -31,6 +31,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleMenuButton(){
     //functionality
+    ui->sessionFrame->setVisible(false);
+    ui->dateFrame->setVisible(false);
+    ui->mainMenu->setVisible(true);
+    ui->mainMenu->clear();
+    ui->mainMenu->addItem("NEW SESSION");
+    ui->mainMenu->addItem("SESSION LOG");
+    ui->mainMenu->addItem("TIME AND DATE");
+    ui->mainMenu->setCurrentRow(0);
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
@@ -73,6 +81,26 @@ void MainWindow::handlePauseButton(){
 
 void MainWindow::handlePowerButton(){
     //functionality
+    power = !power;
+    ui->navigateDown->setDisabled(!power);
+    ui->navigateUp->setDisabled(!power);
+    ui->menuButton->setDisabled(!power);
+    ui->selectButton->setDisabled(!power);
+    ui->startButton->setDisabled(!power);
+    ui->pauseButton->setDisabled(!power);
+    ui->stopButton->setDisabled(!power);
+
+    if(power){
+        ui->mainMenu->addItem("NEW SESSION");
+        ui->mainMenu->addItem("SESSION LOG");
+        ui->mainMenu->addItem("TIME AND DATE");
+        ui->mainMenu->setCurrentRow(0);
+    }else{
+        ui->mainMenu->clear();
+        ui->sessionFrame->setVisible(false);
+        ui->dateFrame->setVisible(false);
+    }
+
     qInfo()<< "power button pressed";
     emit powerButtonPressed();
 }
