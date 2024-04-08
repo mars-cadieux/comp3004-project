@@ -16,6 +16,7 @@ public:
     Neureset();
     ~Neureset();
     void setDateTime(QDate, QTime);
+    void receiveDataRequest();
 
 signals:
     void uploadData(QVector<Session*> sessions);
@@ -31,7 +32,6 @@ public slots:
     void selectButtonPressed();
     DeviceLight* getConnLight();
     float getBattery();
-    void receiveDataRequest();
 
 private:
     EEGHeadset headset;

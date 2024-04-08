@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->dateFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
-    neureset = new Neureset();
+    control = new Controller(this);
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);
     connect(ui->navigateDown, &QPushButton::clicked, this, &MainWindow::handleNavigateDown);
@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     windowThread = QThread::create([this]{ updateWindow(); });
     windowThread->start();
+    control->launch();
 }
 
 MainWindow::~MainWindow()
@@ -149,10 +150,15 @@ void MainWindow::handleSelectButton(){
 
         if(selection == "CONFIRM")
         {
-            neureset->setDateTime(ui->dateTimeEdit->date(), ui->dateTimeEdit->time());
+            control->getNeureset()->setDateTime(ui->dateTimeEdit->date(), ui->dateTimeEdit->time());
             ui->dateFrame->setVisible(false);
         }
     }
+    else if(selection == "UPLOAD")
+    {
+        control->getNeureset()->receiveDataRequest();
+    }
+
 
     qInfo()<< "select button pressed";
     emit selectButtonPressed();
@@ -161,8 +167,8 @@ void MainWindow::handleSelectButton(){
 void MainWindow::updateWindow(){
     while(windowThread->isRunning())
     {
-        ui->connectionLight->setChecked(neureset->getConnLight()->isLit());
-        ui->batteryBar->setValue(neureset->getBattery());
+        ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
+        ui->batteryBar->setValue(control->getNeureset()->getBattery());
     }
 }
 

@@ -3,11 +3,13 @@
 
 #include <QMainWindow>
 #include <QDateTime>
-#include "neureset.h"
+#include "controller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+class Controller;
 
 class MainWindow : public QMainWindow
 {
@@ -20,7 +22,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Neureset* neureset;
+    Controller* control;
     QThread* windowThread;
     bool power = true;
 

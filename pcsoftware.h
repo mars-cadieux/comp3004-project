@@ -22,7 +22,6 @@ public slots:
     void downloadData(QVector<Session*> sessions);
 
 signals:
-    void requestData();
     void sessionDataDownloaded(QVector<Session*> sd);
 
 private:
