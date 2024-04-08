@@ -21,6 +21,7 @@ void Controller::launch(){
     QObject::connect(&w, &MainWindow::stopButtonPressed, &neureset, &Neureset::stopButtonPressed);
     QObject::connect(&w, &MainWindow::selectButtonPressed, &neureset, &Neureset::selectButtonPressed);
 
+    //connect the necessary signals/slots between the PCSoftware and Neureset classes
     QObject::connect(&pcSoft, &PCSoftware::requestData, &neureset, &Neureset::receiveDataRequest);
     QObject::connect(&neureset, &Neureset::uploadData, &pcSoft, &PCSoftware::downloadData);
 

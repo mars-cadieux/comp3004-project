@@ -1,9 +1,12 @@
 #ifndef EEGHEADSET_H
 #define EEGHEADSET_H
 
-#include <QObject>
 #include "electrode.h"
+#include "defs.h"
+
+#include <QObject>
 #include <QVector>
+
 class EEGHeadset : public QObject
 {
     Q_OBJECT
@@ -17,12 +20,11 @@ public:
 private:
     QVector<Electrode*> electrodes;
     //Fixed size frequencies, changes can be made and discussed
-    float frequenciesHz[7][4];
-    float dominantFrequencies[7];
+    float frequenciesHz[NUM_ELECTRODES][4];
+    float dominantFrequencies[NUM_ELECTRODES];
 
 signals:
     void sendHz();
-
 
 };
 

@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    //seeds the ranndom number generator (need to do this once in main()0 before we can generate random numbers)
+    //seeds the random number generator (need to do this once in main()0 before we can generate random numbers)
     srand(time(0));
 
 

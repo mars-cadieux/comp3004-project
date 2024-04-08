@@ -1,11 +1,13 @@
 #include "electrode.h"
 #include <QRandomGenerator>
 
-Electrode::Electrode()
+Electrode::Electrode(QObject *parent)
 {
 
 }
+
 QVector<Sinewave> Electrode::receiveBrainwave() {
+
     //Clear any previous brainwaves
     brainwave.clear();
 
@@ -35,7 +37,7 @@ QVector<Sinewave> Electrode::receiveBrainwave() {
         float frequency = minF + static_cast<float>(QRandomGenerator::global()->generateDouble() * (maxF - minF));
         float amplitude = minA + static_cast<float>(QRandomGenerator::global()->generateDouble() * (maxA - minA));
 
-        brainwave[i] = {frequency, amplitude};
+        brainwave.push_back({frequency, amplitude});
     }
     //Can remove this emit part here and in header files
     emit sendBrainwave(brainwave);

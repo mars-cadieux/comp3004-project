@@ -39,7 +39,7 @@ void Neureset::powerButtonPressed(){
 
 void Neureset::startButtonPressed(){
     qInfo("startButtonPressed from neureset class");
-    //add handling so that this function only starts the session if "new session" is currenlt selected
+    //add handling so that this function only starts the session if "new session" is currently selected
     startSession();
 }
 

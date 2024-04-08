@@ -4,11 +4,19 @@ EEGHeadset::EEGHeadset(QObject *parent)
     : QObject{parent}
 {
 //Create electrodes here from the main branch
+    for(int i=0; i<NUM_ELECTRODES; ++i){
+        Electrode* elec = new Electrode();
+        electrodes.push_back(elec);
+    }
 }
 
 EEGHeadset::~EEGHeadset()
 {
 //Clear electrodes here from the main branch
+    for(int i=0; i<electrodes.size(); ++i){
+        delete electrodes[i];
+    }
+    electrodes.clear();
 }
 
 //Signal processing AND calculating dominant frequency from the signals.
@@ -16,6 +24,7 @@ EEGHeadset::~EEGHeadset()
 void EEGHeadset::measureFrequency()
 {
     for (int i = 0; i < electrodes.size(); i++) {
+
         QVector<Sinewave> brainwave = electrodes[i]->receiveBrainwave();
 
         //Necessary for the dominant frequency formula posted on neureset testing
@@ -44,9 +53,9 @@ float EEGHeadset::measureBaseline() {
     float sum = 0.0;
 
     //Can modify this for more dynamic number of electrodes
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < NUM_ELECTRODES; i++) {
         sum += dominantFrequencies[i];
     }
-    float overallBaseline = sum / 7;
+    float overallBaseline = sum / NUM_ELECTRODES;
     return overallBaseline;
 }

@@ -16,7 +16,7 @@ class Electrode : public QObject
     Q_OBJECT
 
 public:
-    Electrode();
+    explicit Electrode(QObject *parent = nullptr);
     QVector<Sinewave> receiveBrainwave();
 	void applyOffsetFrequency(float frequency);
 
