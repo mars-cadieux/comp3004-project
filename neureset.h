@@ -15,7 +15,7 @@ class Neureset: public QObject
 public:
     Neureset();
     ~Neureset();
-    void setDateTime(QDate, QTime);
+    void setDateTime(QDateTime);
     void receiveDataRequest();
 
 signals:
@@ -37,8 +37,7 @@ private:
     EEGHeadset headset;
     QVector<Session*> sessions;
     DeviceLight* connectionLight;
-    QDate date;
-    QTime time;
+    QDateTime dateTime;
     float battery;
 
     void startSession();

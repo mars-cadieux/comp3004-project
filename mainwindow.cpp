@@ -150,7 +150,7 @@ void MainWindow::handleSelectButton(){
 
         if(selection == "CONFIRM")
         {
-            control->getNeureset()->setDateTime(ui->dateTimeEdit->date(), ui->dateTimeEdit->time());
+            control->getNeureset()->setDateTime(ui->dateTimeEdit->dateTime());
             ui->dateFrame->setVisible(false);
         }
     }

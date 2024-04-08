@@ -57,6 +57,8 @@ void Neureset::startSession()
     Session* currSession = new Session(this);
     sessions.push_back(currSession);
 
+    currSession->setDateTime(dateTime);
+
     float baselineBefore = headset.measureBaseline();
     currSession->setBaselineBefore(baselineBefore);
     //do the treatment
@@ -71,11 +73,9 @@ DeviceLight* Neureset::getConnLight()
     return connectionLight;
 }
 
-void Neureset::setDateTime(QDate newDate, QTime newTime)
+void Neureset::setDateTime(QDateTime newDateTime)
 {
-    date = newDate;
-    time = newTime;
-    qInfo(date.toString().toStdString().c_str());
+    dateTime = newDateTime;
 }
 
 float Neureset::getBattery()
