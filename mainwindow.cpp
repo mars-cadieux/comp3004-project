@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->sessionFrame->setVisible(false);
     ui->dateFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
+    ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     neureset = new Neureset();
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDateTime>
 #include "neureset.h"
 
 QT_BEGIN_NAMESPACE
