@@ -3,6 +3,12 @@
 
 #include <QObject>
 #include <QVector>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QDateTime>
+#include <QVariant>
+#include <QDebug>
+#include <QSqlError>
 
 #include "pcui.h"
 
@@ -12,6 +18,9 @@ class PCSoftware : public QObject
 {
     Q_OBJECT
 public:
+    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm";
+    static const QString DATABASE_PATH;
+
     explicit PCSoftware(QObject *parent = nullptr);
     ~PCSoftware();
 
@@ -22,11 +31,13 @@ public slots:
     void downloadData(QVector<Session*> sessions);
 
 signals:
+    void requestData();
     void sessionDataDownloaded(QVector<Session*> sd);
 
 private:
     QVector<Session*> sessionData;
-
+    QSqlDatabase sessionDB;
+    bool DBInit();
     PCui* pcui;
 
 };
