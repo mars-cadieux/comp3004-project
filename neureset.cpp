@@ -94,7 +94,8 @@ void Neureset::startSession()
     float baselineBefore = headset.measureBaseline();
     currSession->setBaselineBefore(baselineBefore);
     //do the treatment
-    for (int i = 1; i < 4; i++) {
+    for (int i = 1; i < 5; i++) {
+        qInfo("Treatment round %d ",i);
         headset.beginTreatment(i);
     }
     float baselineAfter = headset.measureBaseline();
