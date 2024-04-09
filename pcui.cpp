@@ -46,10 +46,10 @@ void PCui::updateView(QVector<Session *> sessions)
     }
 }
 
-void PCui::on_downloadButton_released()
-{
-    owner->requestData();
-}
+//void PCui::on_downloadButton_released()
+//{
+//    owner->requestData();
+//}
 
 void PCui::setupPlot()
 {

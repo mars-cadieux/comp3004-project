@@ -62,7 +62,8 @@ float EEGHeadset::measureBaseline() {
 //Begins treatment with offset frequency counted from Neureset class
 void EEGHeadset::beginTreatment(int count) {
     for (int i = 0; i < NUM_ELECTRODES; i++) {
-        electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5), i + 1);
+        //electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5), i + 1);
+        electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5));
     }
     qInfo("");
 }

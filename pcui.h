@@ -23,7 +23,7 @@ public:
     void updateView(QVector<Session*> s);
 
 private slots:
-    void on_downloadButton_released();
+    //void on_downloadButton_released();
 
 private:
     Ui::PCui *ui;

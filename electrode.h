@@ -18,11 +18,13 @@ class Electrode : public QObject
 public:
     explicit Electrode(QObject *parent = nullptr);
     QVector<Sinewave> receiveBrainwave();
-    void applyOffsetFrequency(float frequency, int i);
+    void applyOffsetFrequency(float frequency);
 
 private:
     void attach();
     QVector<Sinewave> brainwave;
+    const int id;
+    static int nextID;
 
 signals:
     void sendBrainwave(QVector<Sinewave> brainwave);
