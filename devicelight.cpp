@@ -32,11 +32,16 @@ void DeviceLight::updateLight()
             lit = true;
         }
 
-        flashThread->sleep(1);
+        flashThread->sleep(2);
     }
 }
 
 bool DeviceLight::isLit()
 {
     return lit;
+}
+
+bool DeviceLight::isFlashing()
+{
+    return flashing;
 }

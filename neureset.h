@@ -9,6 +9,7 @@
 #include "session.h"
 #include "devicelight.h"
 #include <QTimer>
+#include <QMutex>
 
 class Neureset: public QObject
 {
@@ -21,6 +22,8 @@ public:
     DeviceLight* getConnLight();
     DeviceLight* getContactLight();
     DeviceLight* getTSLight();
+    void setBattery(int percent);
+    QMutex* getMutex();
 
 signals:
     void uploadData(QVector<Session*> sessions);
@@ -47,11 +50,13 @@ private:
     DeviceLight* contactLight;
     DeviceLight* tsLight;
     QDateTime dateTime;
-    float battery;
+    int battery;
     QTimer* batteryTimer;
     QTimer* disconnectTimer;
     QTimer* beepTimer;
     bool contact;
+    bool power;
+    QMutex mutex;
 
     void startSession();
     float measureBaseline();

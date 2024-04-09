@@ -17,6 +17,7 @@ Neureset::Neureset()
     connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
     batteryTimer->start(10000); // 10 seconds
     contact = true;
+    power = true;
 }
 
 Neureset::~Neureset()
@@ -48,6 +49,7 @@ void Neureset::pauseButtonPressed(){
 }
 
 void Neureset::powerButtonPressed(){
+    power = !power;
     qInfo("powerButtonPressed from neureset class");
 }
 
@@ -81,6 +83,8 @@ void Neureset::reconnectButtonPressed(){
 
 void Neureset::startSession()
 {
+    mutex.lock();
+
     qInfo("in startSession"); //debugging
     Session* currSession = new Session(this);
     sessions.push_back(currSession);
@@ -94,6 +98,8 @@ void Neureset::startSession()
     currSession->setBaselineAfter(baselineAfter);
 
     currSession->print();
+
+    mutex.unlock();
 
     //decrease battery by 5% every seesion
     decreaseBattery(5);
@@ -130,10 +136,31 @@ void Neureset::receiveDataRequest()
 }
 
 void Neureset::decreaseBattery(int decreaseAmount) {
-    battery -= decreaseAmount;
-    if (battery < 0) {
+
+    if(battery < 0)
+    {
         battery = 0;
     }
+
+    mutex.lock();
+
+    if(power)
+    {
+        battery -= decreaseAmount;
+
+        if(battery > 0 && battery <= 10 && !connectionLight->isFlashing())
+        {
+            connectionLight->startFlashing();
+            beepTimer->start(2000);
+        }
+        else if(battery <= 0)
+        {
+            shutDown();
+        }
+    }
+
+    mutex.unlock();
+
     // Potentially update battery level display or trigger low battery warning here
 }
 
@@ -146,6 +173,10 @@ void Neureset::decreaseBatteryByTime() {
 void Neureset::shutDown()
 {
     eraseSessionData();
+    power = false;
+    batteryTimer->stop();
+    beepTimer->stop();
+    disconnectTimer->stop();
     emit connectionLost();
 }
 
@@ -158,4 +189,14 @@ void Neureset::beep()
 {
     qInfo("*BEEP*");
     beepTimer->start(2000);
+}
+
+void Neureset::setBattery(int percent)
+{
+    decreaseBattery(battery - percent);
+}
+
+QMutex* Neureset::getMutex()
+{
+    return &mutex;
 }

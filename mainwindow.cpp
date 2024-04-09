@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->selectButton, &QPushButton::clicked, this, &MainWindow::handleSelectButton);
     connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::handleDisconnectButton);
     connect(ui->reconnectButton, &QPushButton::clicked, this, &MainWindow::handleReconnectButton);
+    connect(ui->battery10Button, &QPushButton::clicked, this, &MainWindow::handleBattery10Button);
+    connect(ui->battery0Button, &QPushButton::clicked, this, &MainWindow::handleBattery0Button);
 
     windowThread = QThread::create([this]{ updateWindow(); });
     windowThread->start();
@@ -175,10 +177,14 @@ void MainWindow::handleSelectButton(){
 void MainWindow::updateWindow(){
     while(windowThread->isRunning())
     {
+        control->getNeureset()->getMutex()->lock();
+
         ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
         ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
+
+        control->getNeureset()->getMutex()->unlock();
     }
 }
 
@@ -221,3 +227,14 @@ void MainWindow::turnOff(){
     ui->dateFrame->setVisible(false);
 }
 
+void MainWindow::handleBattery10Button()
+{
+    control->getNeureset()->setBattery(10);
+    ui->batteryBar->setValue(10);
+}
+
+void MainWindow::handleBattery0Button()
+{
+    control->getNeureset()->setBattery(0);
+    ui->batteryBar->setValue(0);
+}

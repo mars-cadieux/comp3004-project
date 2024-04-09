@@ -949,6 +949,32 @@
      <string>Reconnect Electrodes</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="battery10Button">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>520</y>
+      <width>161</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Battery to 10</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="battery0Button">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>520</y>
+      <width>161</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Battery to 0</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

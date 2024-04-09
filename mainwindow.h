@@ -52,5 +52,7 @@ private slots:
     void handleSelectButton();
     void handleDisconnectButton();
     void handleReconnectButton();
+    void handleBattery10Button();
+    void handleBattery0Button();
 };
 #endif // MAINWINDOW_H
