@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->mainMenu->setCurrentRow(0);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     control = new Controller(this);
+    control->getNeureset()->setDateTime(ui->dateTimeEdit->dateTime());
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);
     connect(ui->navigateDown, &QPushButton::clicked, this, &MainWindow::handleNavigateDown);
@@ -31,7 +32,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::handleMenuButton(){
-    //functionality
+    //Returns to main menu, despite anything that is currently happening. Does not suspend session as of this time.
     ui->sessionFrame->setVisible(false);
     ui->dateFrame->setVisible(false);
     ui->mainMenu->setVisible(true);
@@ -81,7 +82,7 @@ void MainWindow::handlePauseButton(){
 }
 
 void MainWindow::handlePowerButton(){
-    //functionality
+    //Power off disables all interfaces the user can access on the neureset. When turned back on, it is returned to the main menu.
     power = !power;
     ui->navigateDown->setDisabled(!power);
     ui->navigateUp->setDisabled(!power);

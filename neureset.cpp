@@ -48,7 +48,7 @@ void Neureset::stopButtonPressed(){
 }
 
 void Neureset::selectButtonPressed(){
-    qInfo("stopButtonPressed from neureset class");
+    qInfo("selectButtonPressed from neureset class");
 }
 
 void Neureset::startSession()

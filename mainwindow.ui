@@ -164,7 +164,7 @@
        <string>NEW SESSION</string>
       </property>
       <property name="textAlignment">
-       <set>AlignCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </item>
      <item>
@@ -172,7 +172,7 @@
        <string>SESSION LOG</string>
       </property>
       <property name="textAlignment">
-       <set>AlignCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </item>
      <item>
@@ -180,7 +180,7 @@
        <string>TIME AND DATE</string>
       </property>
       <property name="textAlignment">
-       <set>AlignCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </item>
     </widget>
