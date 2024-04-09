@@ -9,7 +9,7 @@ Electrode::Electrode(QObject *parent)
 
 }
 
-QVector<Sinewave> Electrode::receiveBrainwave() {
+void Electrode::receiveBrainwave() {
 
     //Clear any previous brainwaves
     brainwave.clear();
@@ -44,10 +44,21 @@ QVector<Sinewave> Electrode::receiveBrainwave() {
 
         brainwave.push_back({frequency, amplitude});
     }
+    qInfo("end of receiveBrainwave()");
     //Can remove this emit part here and in header files
-    emit sendBrainwave(brainwave);
-    return brainwave;
+    //emit sendBrainwave(brainwave);
 }
+
 void Electrode::applyOffsetFrequency(float frequency) {
     qInfo("Signal has been emitted at Electrode %d for a frequency of %f ", id, frequency);
+}
+
+int Electrode::getId() const
+{
+    return id;
+}
+
+QVector<Sinewave> Electrode::getBrainwave() const
+{
+    return brainwave;
 }

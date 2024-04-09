@@ -43,9 +43,12 @@ public slots:
     float getBattery();
     void beep();
 
+    void baselineReceived();
+
 private:
     EEGHeadset headset;
     QVector<Session*> sessions;
+    Session* currentSession;
     DeviceLight* connectionLight;
     DeviceLight* contactLight;
     DeviceLight* tsLight;

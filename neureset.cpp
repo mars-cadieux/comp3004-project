@@ -18,6 +18,8 @@ Neureset::Neureset()
     batteryTimer->start(10000); // 10 seconds
     contact = true;
     power = true;
+
+    QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
 }
 
 Neureset::~Neureset()
@@ -85,28 +87,17 @@ void Neureset::startSession()
 {
     mutex.lock();
 
-    qInfo("in startSession"); //debugging
+    //qInfo("in startSession"); //debugging
     Session* currSession = new Session(this);
     sessions.push_back(currSession);
+    currentSession = currSession;
 
-    currSession->setDateTime(dateTime);
+    currentSession->setDateTime(dateTime);
 
-    float baselineBefore = headset.measureBaseline();
-    currSession->setBaselineBefore(baselineBefore);
-    //do the treatment
-    for (int i = 1; i < 5; i++) {
-        qInfo("Treatment round %d ",i);
-        headset.beginTreatment(i);
-    }
-    float baselineAfter = headset.measureBaseline();
-    currSession->setBaselineAfter(baselineAfter);
+    //float baselineBefore = headset.measureBaseline();
+    headset.measureBaseline();
+    //currSession->setBaselineBefore(baselineBefore);
 
-    currSession->print();
-
-    mutex.unlock();
-
-    //decrease battery by 5% every seesion
-    decreaseBattery(5);
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -194,6 +185,43 @@ void Neureset::beep()
     qInfo("*BEEP*");
     beepTimer->start(2000);
 }
+
+void Neureset::baselineReceived()
+{
+    //get the baseline from the headset (the sender of the signal)
+    EEGHeadset* hs = qobject_cast<EEGHeadset*>(sender());
+    float base = hs->getBaseline();
+
+    //if the "before" baseline is 0, it hasn't been calculated yet. store received baseline in the beforeBaseline variable and start the treatment
+    if(currentSession->getBaselineBefore() == 0.0){
+        currentSession->setBaselineBefore(base);
+
+        //do the treatment
+        for (int i = 1; i < 5; i++) {
+            qInfo("Treatment round %d ",i);
+            headset.beginTreatment(i);
+        }
+        //measure the "after" baseline
+        headset.measureBaseline();
+
+        //currentSession->setBaselineAfter(base);
+//        currentSession->print();
+
+//        mutex.unlock();
+//        //decrease battery by 5% every session
+//        decreaseBattery(5);
+    }
+    //otherwise, we have just calculated the after baseline. store received baseline in the afterBaseline variable and finish the session
+    else{
+        currentSession->setBaselineAfter(base);
+        currentSession->print();
+
+        mutex.unlock();
+        //decrease battery by 5% every session
+        decreaseBattery(5);
+    }
+}
+
 
 void Neureset::setBattery(int percent)
 {

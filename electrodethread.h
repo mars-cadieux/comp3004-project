@@ -16,7 +16,7 @@ public:
     void run() override;
 
 signals:
-    void resultReady(const qfloat16 &freq);
+    void resultReady(const QString &s);
 
 private:
     Electrode* electrode; //pointer to the electrode that this thread is doing the work for
