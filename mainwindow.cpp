@@ -184,6 +184,19 @@ void MainWindow::updateWindow(){
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
+        if(ui->sessionFrame->isVisible())
+        {
+            ui->startButton->setEnabled(true);
+            ui->stopButton->setEnabled(true);
+            ui->pauseButton->setEnabled(true);
+        }
+        else
+        {
+            ui->startButton->setEnabled(false);
+            ui->stopButton->setEnabled(false);
+            ui->pauseButton->setEnabled(false);
+        }
+
         control->getNeureset()->getMutex()->unlock();
     }
 }

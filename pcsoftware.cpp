@@ -33,9 +33,7 @@ PCSoftware::PCSoftware(QObject *parent)
         rowCount ++;
 
         Session* newSession = new Session();
-        qDebug() << query.value(1);
         newSession->setDateTime(QDateTime::fromString(query.value(1).toString(), DATE_FORMAT));
-        qDebug() << newSession->getDateTime();
         newSession->setBaselineBefore(std::stof(query.value(2).toString().toStdString()));
         newSession->setBaselineAfter(std::stof(query.value(3).toString().toStdString()));
         sessionData.push_back(newSession);
