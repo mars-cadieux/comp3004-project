@@ -59,3 +59,10 @@ float EEGHeadset::measureBaseline() {
     float overallBaseline = sum / NUM_ELECTRODES;
     return overallBaseline;
 }
+//Begins treatment with offset frequency counted from Neureset class
+void EEGHeadset::beginTreatment(int count) {
+    for (int i = 0; i < NUM_ELECTRODES; i++) {
+        electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5), i + 1);
+    }
+    qInfo("");
+}

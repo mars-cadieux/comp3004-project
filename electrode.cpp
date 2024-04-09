@@ -43,3 +43,6 @@ QVector<Sinewave> Electrode::receiveBrainwave() {
     emit sendBrainwave(brainwave);
     return brainwave;
 }
+void Electrode::applyOffsetFrequency(float frequency, int i) {
+    qInfo("Signal has been emitted at Electrode %d for a frequency of %f ", i, frequency);
+}

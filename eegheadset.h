@@ -16,6 +16,7 @@ public:
     //Signal processing
     void measureFrequency();
     float measureBaseline();
+    void beginTreatment(int count);
 
 private:
     QVector<Electrode*> electrodes;
