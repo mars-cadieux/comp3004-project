@@ -17,6 +17,9 @@ public:
     ~Neureset();
     void setDateTime(QDateTime);
     void receiveDataRequest();
+    DeviceLight* getConnLight();
+    DeviceLight* getContactLight();
+    DeviceLight* getTSLight();
 
 signals:
     void uploadData(QVector<Session*> sessions);
@@ -30,13 +33,14 @@ public slots:
     void startButtonPressed();
     void stopButtonPressed();
     void selectButtonPressed();
-    DeviceLight* getConnLight();
     float getBattery();
 
 private:
     EEGHeadset headset;
     QVector<Session*> sessions;
     DeviceLight* connectionLight;
+    DeviceLight* contactLight;
+    DeviceLight* tsLight;
     QDateTime dateTime;
     float battery;
 
