@@ -34,6 +34,8 @@ public slots:
     void startButtonPressed();
     void stopButtonPressed();
     void selectButtonPressed();
+    void disconnectButtonPressed();
+    void reconnectButtonPressed();
     float getBattery();
 
 private:

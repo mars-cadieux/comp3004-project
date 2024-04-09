@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->dateFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->reconnectButton->setEnabled(false);
     control = new Controller(this);
     control->getNeureset()->setDateTime(ui->dateTimeEdit->dateTime());
 
@@ -20,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::handleStartButton);
     connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::handleStopButton);
     connect(ui->selectButton, &QPushButton::clicked, this, &MainWindow::handleSelectButton);
+    connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::handleDisconnectButton);
+    connect(ui->reconnectButton, &QPushButton::clicked, this, &MainWindow::handleReconnectButton);
 
     windowThread = QThread::create([this]{ updateWindow(); });
     windowThread->start();
@@ -109,7 +112,6 @@ void MainWindow::handlePowerButton(){
 
 void MainWindow::handleStartButton(){
     //functionality
-    control->getNeureset()->getConnLight()->startFlashing();
     qInfo()<< "start button pressed";
     emit startButtonPressed();
 }
@@ -174,5 +176,21 @@ void MainWindow::updateWindow(){
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
     }
+}
+
+void MainWindow::handleDisconnectButton(){
+    //functionality
+    qInfo()<< "disconnect button pressed";
+    ui->disconnectButton->setEnabled(false);
+    ui->reconnectButton->setEnabled(true);
+    emit disconnectButtonPressed();
+}
+
+void MainWindow::handleReconnectButton(){
+    //functionality
+    qInfo()<< "reconnect button pressed";
+    ui->reconnectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(true);
+    emit reconnectButtonPressed();
 }
 

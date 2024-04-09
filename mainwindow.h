@@ -35,7 +35,8 @@ signals:
     void startButtonPressed();
     void stopButtonPressed();
     void selectButtonPressed();
-
+    void disconnectButtonPressed();
+    void reconnectButtonPressed();
 
 private slots:
     void handleMenuButton();
@@ -46,7 +47,7 @@ private slots:
     void handleStartButton();
     void handleStopButton();
     void handleSelectButton();
-
-
+    void handleDisconnectButton();
+    void handleReconnectButton();
 };
 #endif // MAINWINDOW_H

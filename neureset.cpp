@@ -60,6 +60,14 @@ void Neureset::selectButtonPressed(){
     qInfo("selectButtonPressed from neureset class");
 }
 
+void Neureset::disconnectButtonPressed(){
+    qInfo("disconnectButtonPressed from neureset class");
+}
+
+void Neureset::reconnectButtonPressed(){
+    qInfo("reconnectButtonPressed from neureset class");
+}
+
 void Neureset::startSession()
 {
     qInfo("in startSession"); //debugging
