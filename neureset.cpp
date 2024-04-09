@@ -1,11 +1,17 @@
 #include "neureset.h"
 
+
 Neureset::Neureset()
 {
     connectionLight = new DeviceLight();
     contactLight = new DeviceLight();
     tsLight = new DeviceLight();
     battery = 100;
+
+    //timer to decrease battery life by 1 percent every 10 seconds
+    batteryTimer = new QTimer(this);
+    connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
+    batteryTimer->start(10000); // 10 seconds
 }
 
 Neureset::~Neureset()
@@ -14,6 +20,7 @@ Neureset::~Neureset()
         delete sessions[i];
     }
     sessions.clear();
+
 }
 
 
@@ -68,6 +75,9 @@ void Neureset::startSession()
     currSession->setBaselineAfter(baselineAfter);
 
     currSession->print();
+
+    //decrease battery by 5% every seesion
+    decreaseBattery(5);
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -98,4 +108,18 @@ float Neureset::getBattery()
 void Neureset::receiveDataRequest()
 {
     emit uploadData(sessions);
+}
+
+void Neureset::decreaseBattery(int decreaseAmount) {
+    battery -= decreaseAmount;
+    if (battery < 0) {
+        battery = 0;
+    }
+    // Potentially update battery level display or trigger low battery warning here
+}
+
+// Method to decrease battery because of time
+void Neureset::decreaseBatteryByTime() {
+    decreaseBattery(1);
+    batteryTimer->start(10000);
 }

@@ -8,6 +8,7 @@
 #include "electrode.h" //I don't think the neureset should have direct access to the electrodes, the headset should be a mediator between the two and the neureset shouldn't be aware of the electrodes existence. open to discussion though ofc. -mars
 #include "session.h"
 #include "devicelight.h"
+#include <QTimer>
 
 class Neureset: public QObject
 {
@@ -43,6 +44,7 @@ private:
     DeviceLight* tsLight;
     QDateTime dateTime;
     float battery;
+    QTimer* batteryTimer;
 
     void startSession();
     float measureBaseline();
@@ -51,6 +53,8 @@ private:
     void treatmentStarted();
     void treatmentFinished();
     void electrodeFinished();
+    void decreaseBattery(int decreaseAmount);
+    void decreaseBatteryByTime();
 
 };
 
