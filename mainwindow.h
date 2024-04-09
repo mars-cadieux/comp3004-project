@@ -38,6 +38,9 @@ signals:
     void disconnectButtonPressed();
     void reconnectButtonPressed();
 
+public slots:
+    void turnOff();
+
 private slots:
     void handleMenuButton();
     void handleNavigateDown();

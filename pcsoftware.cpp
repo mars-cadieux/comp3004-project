@@ -70,6 +70,7 @@ void PCSoftware::downloadData(QVector<Session *> sessions)
 {
     sessionDB.transaction();
     QSqlQuery query;
+
     //make a deep copy of each session and store it in the session database and the sessionData vector
     for(int i=0; i<sessions.size(); ++i){
         if(!(sessions[i]->isUploaded())){

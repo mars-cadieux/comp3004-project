@@ -23,6 +23,8 @@ void Controller::launch(){
     QObject::connect(window, &MainWindow::disconnectButtonPressed, &neureset, &Neureset::disconnectButtonPressed);
     QObject::connect(window, &MainWindow::reconnectButtonPressed, &neureset, &Neureset::reconnectButtonPressed);
 
+    QObject::connect(&neureset, &Neureset::connectionLost, window, &MainWindow::turnOff);
+
     //connect the necessary signals/slots between the PCSoftware and Neureset classes
     QObject::connect(&neureset, &Neureset::uploadData, &pcSoft, &PCSoftware::downloadData);
 

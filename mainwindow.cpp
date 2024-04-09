@@ -100,10 +100,14 @@ void MainWindow::handlePowerButton(){
         ui->mainMenu->addItem("SESSION LOG");
         ui->mainMenu->addItem("TIME AND DATE");
         ui->mainMenu->setCurrentRow(0);
+        ui->disconnectButton->setDisabled(false);
+        ui->reconnectButton->setDisabled(true);
     }else{
         ui->mainMenu->clear();
         ui->sessionFrame->setVisible(false);
         ui->dateFrame->setVisible(false);
+        ui->reconnectButton->setEnabled(false);
+        ui->reconnectButton->setEnabled(false);
     }
 
     qInfo()<< "power button pressed";
@@ -183,6 +187,7 @@ void MainWindow::handleDisconnectButton(){
     qInfo()<< "disconnect button pressed";
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
+    control->getNeureset()->getConnLight()->startFlashing();
     emit disconnectButtonPressed();
 }
 
@@ -191,6 +196,28 @@ void MainWindow::handleReconnectButton(){
     qInfo()<< "reconnect button pressed";
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
+    control->getNeureset()->getConnLight()->stopFlashing();
     emit reconnectButtonPressed();
+}
+
+void MainWindow::turnOff(){
+    //Power off disables all interfaces the user can access on the neureset. When turned back on, it is returned to the main menu.
+    power = false;
+    ui->navigateDown->setDisabled(true);
+    ui->navigateUp->setDisabled(true);
+    ui->menuButton->setDisabled(true);
+    ui->selectButton->setDisabled(true);
+    ui->startButton->setDisabled(true);
+    ui->pauseButton->setDisabled(true);
+    ui->stopButton->setDisabled(true);
+    ui->reconnectButton->setDisabled(true);
+    ui->reconnectButton->setDisabled(true);
+    control->getNeureset()->getConnLight()->stopFlashing();
+    control->getNeureset()->getContactLight()->stopFlashing();
+    control->getNeureset()->getTSLight()->stopFlashing();
+
+    ui->mainMenu->clear();
+    ui->sessionFrame->setVisible(false);
+    ui->dateFrame->setVisible(false);
 }
 

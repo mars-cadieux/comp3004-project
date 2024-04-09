@@ -10,8 +10,13 @@ Neureset::Neureset()
 
     //timer to decrease battery life by 1 percent every 10 seconds
     batteryTimer = new QTimer(this);
+    disconnectTimer = new QTimer(this);
+    beepTimer = new QTimer(this);
     connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
+    connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
+    connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
     batteryTimer->start(10000); // 10 seconds
+    contact = true;
 }
 
 Neureset::~Neureset()
@@ -62,10 +67,16 @@ void Neureset::selectButtonPressed(){
 
 void Neureset::disconnectButtonPressed(){
     qInfo("disconnectButtonPressed from neureset class");
+    disconnectTimer->start(10000); // 10 seconds
+    beepTimer->start(2000);
+    contact = false;
 }
 
 void Neureset::reconnectButtonPressed(){
     qInfo("reconnectButtonPressed from neureset class");
+    disconnectTimer->stop();
+    beepTimer->stop();
+    contact = true;
 }
 
 void Neureset::startSession()
@@ -130,4 +141,21 @@ void Neureset::decreaseBattery(int decreaseAmount) {
 void Neureset::decreaseBatteryByTime() {
     decreaseBattery(1);
     batteryTimer->start(10000);
+}
+
+void Neureset::shutDown()
+{
+    eraseSessionData();
+    emit connectionLost();
+}
+
+void Neureset::eraseSessionData()
+{
+    sessions.clear();
+}
+
+void Neureset::beep()
+{
+    qInfo("*BEEP*");
+    beepTimer->start(2000);
 }

@@ -24,6 +24,7 @@ public:
 
 signals:
     void uploadData(QVector<Session*> sessions);
+    void connectionLost();
 
 public slots:
     void menuButtonPressed();
@@ -37,6 +38,7 @@ public slots:
     void disconnectButtonPressed();
     void reconnectButtonPressed();
     float getBattery();
+    void beep();
 
 private:
     EEGHeadset headset;
@@ -47,6 +49,9 @@ private:
     QDateTime dateTime;
     float battery;
     QTimer* batteryTimer;
+    QTimer* disconnectTimer;
+    QTimer* beepTimer;
+    bool contact;
 
     void startSession();
     float measureBaseline();
@@ -57,7 +62,8 @@ private:
     void electrodeFinished();
     void decreaseBattery(int decreaseAmount);
     void decreaseBatteryByTime();
-
+    void shutDown();
+    void eraseSessionData();
 };
 
 #endif // NEURESET_H
