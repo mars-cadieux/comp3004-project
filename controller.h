@@ -7,20 +7,24 @@
 
 #include <QObject>
 
+class MainWindow;
+
 class Controller : public QObject
 {
     Q_OBJECT
 public:
-    explicit Controller(QObject *parent = nullptr);
+    explicit Controller(MainWindow* w, QObject *parent = nullptr);
     ~Controller();
     void launch();
+    Neureset* getNeureset();
+    PCSoftware* getPCSoftware();
 
 signals:
 
 private:
     Neureset neureset;
     PCSoftware pcSoft;
-    MainWindow w;
+    MainWindow* window;
 
 };
 

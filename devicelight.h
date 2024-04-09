@@ -11,6 +11,8 @@ public:
     void stopFlashing();
     void updateLight();
     bool isLit();
+    bool isFlashing();
+
 private:
     bool lit;
     bool flashing;

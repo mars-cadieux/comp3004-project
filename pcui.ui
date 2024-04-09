@@ -6,26 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
+    <width>581</width>
     <height>340</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="downloadButton">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>220</y>
-     <width>83</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Download</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="sessionDataTable">
    <property name="geometry">
     <rect>

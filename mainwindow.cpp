@@ -8,7 +8,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->sessionFrame->setVisible(false);
     ui->dateFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
-    neureset = new Neureset();
+    ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->reconnectButton->setEnabled(false);
+    control = new Controller(this);
+    control->getNeureset()->setDateTime(ui->dateTimeEdit->dateTime());
 
     connect(ui->menuButton, &QPushButton::clicked, this, &MainWindow::handleMenuButton);
     connect(ui->navigateDown, &QPushButton::clicked, this, &MainWindow::handleNavigateDown);
@@ -18,9 +21,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::handleStartButton);
     connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::handleStopButton);
     connect(ui->selectButton, &QPushButton::clicked, this, &MainWindow::handleSelectButton);
+    connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::handleDisconnectButton);
+    connect(ui->reconnectButton, &QPushButton::clicked, this, &MainWindow::handleReconnectButton);
+    connect(ui->battery10Button, &QPushButton::clicked, this, &MainWindow::handleBattery10Button);
+    connect(ui->battery0Button, &QPushButton::clicked, this, &MainWindow::handleBattery0Button);
 
     windowThread = QThread::create([this]{ updateWindow(); });
     windowThread->start();
+    control->launch();
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +37,15 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::handleMenuButton(){
-    //functionality
+    //Returns to main menu, despite anything that is currently happening. Does not suspend session as of this time.
+    ui->sessionFrame->setVisible(false);
+    ui->dateFrame->setVisible(false);
+    ui->mainMenu->setVisible(true);
+    ui->mainMenu->clear();
+    ui->mainMenu->addItem("NEW SESSION");
+    ui->mainMenu->addItem("SESSION LOG");
+    ui->mainMenu->addItem("TIME AND DATE");
+    ui->mainMenu->setCurrentRow(0);
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
@@ -71,7 +87,31 @@ void MainWindow::handlePauseButton(){
 }
 
 void MainWindow::handlePowerButton(){
-    //functionality
+    //Power off disables all interfaces the user can access on the neureset. When turned back on, it is returned to the main menu.
+    power = !power;
+    ui->navigateDown->setDisabled(!power);
+    ui->navigateUp->setDisabled(!power);
+    ui->menuButton->setDisabled(!power);
+    ui->selectButton->setDisabled(!power);
+    ui->startButton->setDisabled(!power);
+    ui->pauseButton->setDisabled(!power);
+    ui->stopButton->setDisabled(!power);
+
+    if(power){
+        ui->mainMenu->addItem("NEW SESSION");
+        ui->mainMenu->addItem("SESSION LOG");
+        ui->mainMenu->addItem("TIME AND DATE");
+        ui->mainMenu->setCurrentRow(0);
+        ui->disconnectButton->setDisabled(false);
+        ui->reconnectButton->setDisabled(true);
+    }else{
+        ui->mainMenu->clear();
+        ui->sessionFrame->setVisible(false);
+        ui->dateFrame->setVisible(false);
+        ui->reconnectButton->setEnabled(false);
+        ui->reconnectButton->setEnabled(false);
+    }
+
     qInfo()<< "power button pressed";
     emit powerButtonPressed();
 }
@@ -120,10 +160,15 @@ void MainWindow::handleSelectButton(){
 
         if(selection == "CONFIRM")
         {
-            neureset->setDateTime(ui->dateTimeEdit->date(), ui->dateTimeEdit->time());
+            control->getNeureset()->setDateTime(ui->dateTimeEdit->dateTime());
             ui->dateFrame->setVisible(false);
         }
     }
+    else if(selection == "UPLOAD")
+    {
+        control->getNeureset()->receiveDataRequest();
+    }
+
 
     qInfo()<< "select button pressed";
     emit selectButtonPressed();
@@ -132,8 +177,64 @@ void MainWindow::handleSelectButton(){
 void MainWindow::updateWindow(){
     while(windowThread->isRunning())
     {
-        ui->connectionLight->setChecked(neureset->getConnLight()->isLit());
-        ui->batteryBar->setValue(neureset->getBattery());
+        control->getNeureset()->getMutex()->lock();
+
+        ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
+        ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
+        ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
+        ui->batteryBar->setValue(control->getNeureset()->getBattery());
+
+        control->getNeureset()->getMutex()->unlock();
     }
 }
 
+void MainWindow::handleDisconnectButton(){
+    //functionality
+    qInfo()<< "disconnect button pressed";
+    ui->disconnectButton->setEnabled(false);
+    ui->reconnectButton->setEnabled(true);
+    control->getNeureset()->getConnLight()->startFlashing();
+    emit disconnectButtonPressed();
+}
+
+void MainWindow::handleReconnectButton(){
+    //functionality
+    qInfo()<< "reconnect button pressed";
+    ui->reconnectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(true);
+    control->getNeureset()->getConnLight()->stopFlashing();
+    emit reconnectButtonPressed();
+}
+
+void MainWindow::turnOff(){
+    //Power off disables all interfaces the user can access on the neureset. When turned back on, it is returned to the main menu.
+    power = false;
+    ui->navigateDown->setDisabled(true);
+    ui->navigateUp->setDisabled(true);
+    ui->menuButton->setDisabled(true);
+    ui->selectButton->setDisabled(true);
+    ui->startButton->setDisabled(true);
+    ui->pauseButton->setDisabled(true);
+    ui->stopButton->setDisabled(true);
+    ui->reconnectButton->setDisabled(true);
+    ui->reconnectButton->setDisabled(true);
+    control->getNeureset()->getConnLight()->stopFlashing();
+    control->getNeureset()->getContactLight()->stopFlashing();
+    control->getNeureset()->getTSLight()->stopFlashing();
+
+    ui->mainMenu->clear();
+    ui->sessionFrame->setVisible(false);
+    ui->dateFrame->setVisible(false);
+}
+
+void MainWindow::handleBattery10Button()
+{
+    control->getNeureset()->setBattery(10);
+    ui->batteryBar->setValue(10);
+}
+
+void MainWindow::handleBattery0Button()
+{
+    control->getNeureset()->setBattery(0);
+    ui->batteryBar->setValue(0);
+}

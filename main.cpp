@@ -11,8 +11,7 @@ int main(int argc, char *argv[])
 
 
     QApplication a(argc, argv);
-    Controller control;
-    control.launch();
+    MainWindow w;
 
     return a.exec();
 }
