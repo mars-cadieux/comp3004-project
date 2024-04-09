@@ -108,6 +108,7 @@ void MainWindow::handlePowerButton(){
 
 void MainWindow::handleStartButton(){
     //functionality
+    control->getNeureset()->getConnLight()->startFlashing();
     qInfo()<< "start button pressed";
     emit startButtonPressed();
 }
@@ -167,6 +168,8 @@ void MainWindow::handleSelectButton(){
 void MainWindow::updateWindow(){
     while(windowThread->isRunning())
     {
+        ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
+        ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
     }

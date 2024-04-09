@@ -3,6 +3,8 @@
 Neureset::Neureset()
 {
     connectionLight = new DeviceLight();
+    contactLight = new DeviceLight();
+    tsLight = new DeviceLight();
     battery = 100;
 }
 
@@ -71,6 +73,16 @@ void Neureset::startSession()
 DeviceLight* Neureset::getConnLight()
 {
     return connectionLight;
+}
+
+DeviceLight* Neureset::getContactLight()
+{
+    return contactLight;
+}
+
+DeviceLight* Neureset::getTSLight()
+{
+    return tsLight;
 }
 
 void Neureset::setDateTime(QDateTime newDateTime)
