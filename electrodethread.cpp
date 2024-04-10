@@ -11,18 +11,16 @@ ElectrodeThread::ElectrodeThread(QObject *parent, Electrode *elec)
 
 void ElectrodeThread::run()
 {
-    qfloat16 result;
-    qInfo("Reading frequency..."); //we should see 21 of these printed
+    int elecId = electrode->getId();
+    qInfo("Electrode %d reading frequency...", elecId); //we should see 7 of these printed
 
-    //using a 10 second delay instead of a whole minute
-    delay(10);
+    //using a 5 second delay
+    delay(5);
 
-    //float freq = electrode->receiveBrainwave();
+    electrode->receiveBrainwave(); //the brainwave will be stored in the electrode object
 
-    //I'm unsure if I'm using this function correctly, I'm trying to convert a float to a qFloat16 but this function needs a third argument which represents the number of allocated entries and I'm unsure what that means
-    //we want this thread to emit the frequency read by the electrode. a QThread has to emit some kind of Qobject though, it can't just send a regular float/string etc. in A3 I had it emit a QString which indicated which elevator a request got allocated to
-    //qFloatToFloat16(&result, &freq, 16);
-    //emit resultReady(result);
+    emit resultReady(QString::number(elecId));
+    //qInfo("result ready");
 }
 
 //adds a delay for the specified number of seconds

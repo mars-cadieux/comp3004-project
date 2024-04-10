@@ -9,15 +9,20 @@ Neureset::Neureset()
     battery = 100;
 
     //timer to decrease battery life by 1 percent every 10 seconds
-    batteryTimer = new QTimer(this);
+    //batteryTimer = new QTimer(this);
     disconnectTimer = new QTimer(this);
     beepTimer = new QTimer(this);
-    connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
+
+    batteryThread = QThread::create([this]{ decreaseBatteryByTime(); });
+    batteryThread->start();
+    //connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
     connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
     connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
-    batteryTimer->start(10000); // 10 seconds
+    //batteryTimer->start(10000); // 10 seconds
     contact = true;
     power = true;
+
+    QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
 }
 
 Neureset::~Neureset()
@@ -85,28 +90,19 @@ void Neureset::startSession()
 {
     mutex.lock();
 
-    qInfo("in startSession"); //debugging
+    baselines.clear();
+
+    //qInfo("in startSession"); //debugging
     Session* currSession = new Session(this);
     sessions.push_back(currSession);
+    currentSession = currSession;
 
-    currSession->setDateTime(dateTime);
+    currentSession->setDateTime(dateTime);
 
-    float baselineBefore = headset.measureBaseline();
-    currSession->setBaselineBefore(baselineBefore);
-    //do the treatment
-    for (int i = 1; i < 5; i++) {
-        qInfo("Treatment round %d ",i);
-        headset.beginTreatment(i);
-    }
-    float baselineAfter = headset.measureBaseline();
-    currSession->setBaselineAfter(baselineAfter);
+    //float baselineBefore = headset.measureBaseline();
+    headset.measureBaseline();
+    //currSession->setBaselineBefore(baselineBefore);
 
-    currSession->print();
-
-    mutex.unlock();
-
-    //decrease battery by 5% every seesion
-    decreaseBattery(5);
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -170,15 +166,19 @@ void Neureset::decreaseBattery(int decreaseAmount) {
 
 // Method to decrease battery because of time
 void Neureset::decreaseBatteryByTime() {
-    decreaseBattery(1);
-    batteryTimer->start(10000);
+
+    while(batteryThread->isRunning())
+    {
+        batteryThread->sleep(5);
+        decreaseBattery(1);
+    }
 }
 
 void Neureset::shutDown()
 {
     eraseSessionData();
     power = false;
-    batteryTimer->stop();
+    //batteryTimer->stop();
     beepTimer->stop();
     disconnectTimer->stop();
     emit connectionLost();
@@ -194,6 +194,36 @@ void Neureset::beep()
     qInfo("*BEEP*");
     beepTimer->start(2000);
 }
+
+void Neureset::baselineReceived()
+{
+    //get the baseline from the headset
+    float base = headset.getBaseline();
+    baselines.push_back(base);
+
+    //we calculate one baseline before each round of treatment (and there are 4 rounds) + a final "after" baseline. if we have less than 5 baselines in our vector, we are not done treatment
+    if(baselines.size() < 5){
+        int i = baselines.size();
+
+        //do the treatment
+        qInfo("\nTreatment round %d ",i);
+        headset.beginTreatment(i);
+
+        //measure the baseline for the next round
+        headset.measureBaseline();
+    }
+    //otherwise, we have just calculated the final baseline. store received baseline in the afterBaseline variable and finish the session
+    else{
+        currentSession->setBaselineBefore(baselines[0]);
+        currentSession->setBaselineAfter(base);
+        currentSession->print();
+
+        mutex.unlock();
+        //decrease battery by 5% every session
+        decreaseBattery(5);
+    }
+}
+
 
 void Neureset::setBattery(int percent)
 {

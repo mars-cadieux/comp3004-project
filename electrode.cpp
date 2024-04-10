@@ -1,15 +1,20 @@
 #include "electrode.h"
 #include <QRandomGenerator>
 
+int Electrode::nextID = 0;
+
 Electrode::Electrode(QObject *parent)
+    : QObject{parent}, id(++nextID)
 {
 
 }
 
-QVector<Sinewave> Electrode::receiveBrainwave() {
+void Electrode::receiveBrainwave() {
 
     //Clear any previous brainwaves
     brainwave.clear();
+
+    //qInfo("Electrode %d reading brainwave... ", id);
 
     //Frequency ranges for delta, theta, alpha, beta
     float frequencies[4][2] = {
@@ -39,10 +44,29 @@ QVector<Sinewave> Electrode::receiveBrainwave() {
 
         brainwave.push_back({frequency, amplitude});
     }
+    //qInfo("end of receiveBrainwave()");
     //Can remove this emit part here and in header files
-    emit sendBrainwave(brainwave);
-    return brainwave;
+    //emit sendBrainwave(brainwave);
 }
-void Electrode::applyOffsetFrequency(float frequency, int i) {
-    qInfo("Signal has been emitted at Electrode %d for a frequency of %f ", i, frequency);
+
+void Electrode::applyOffsetFrequency(float frequency) {
+    zapThread = QThread::create([this, frequency]{ zap(frequency); });
+    zapThread->start();
+}
+
+void Electrode::zap(float frequency)
+{
+    zapThread->sleep(1);
+    qInfo("Signal has been emitted at Electrode %d for a frequency of %f ", id, frequency);
+    zapThread->quit();
+}
+
+int Electrode::getId() const
+{
+    return id;
+}
+
+QVector<Sinewave> Electrode::getBrainwave() const
+{
+    return brainwave;
 }

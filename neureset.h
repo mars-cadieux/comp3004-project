@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QThread>
 
 #include "eegheadset.h"
 #include "electrode.h" //I don't think the neureset should have direct access to the electrodes, the headset should be a mediator between the two and the neureset shouldn't be aware of the electrodes existence. open to discussion though ofc. -mars
@@ -43,12 +44,19 @@ public slots:
     float getBattery();
     void beep();
 
+    void baselineReceived();
+
 private:
     EEGHeadset headset;
     QVector<Session*> sessions;
+    Session* currentSession;
+
+    QVector<float> baselines;   //stores the baselines calculated before each round of treatment + final baseline
+
     DeviceLight* connectionLight;
     DeviceLight* contactLight;
     DeviceLight* tsLight;
+
     QDateTime dateTime;
     int battery;
     QTimer* batteryTimer;
@@ -57,6 +65,7 @@ private:
     bool contact;
     bool power;
     QMutex mutex;
+    QThread* batteryThread;
 
     void startSession();
     float measureBaseline();

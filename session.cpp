@@ -3,7 +3,8 @@
 Session::Session(QObject *parent, QDateTime dt)
     : QObject{parent}, dateTime(dt)
 {
-
+    beforeBaseline = 0.0;
+    afterBaseline = 0.0;
 }
 
 //custom copy ctor used when making a deep copy of a session which gets uploaded to the PC. Note that this ctor always sets uploaded to true; this ctor should only be used for uploading
