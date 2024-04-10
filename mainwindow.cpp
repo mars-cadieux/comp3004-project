@@ -29,6 +29,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     windowThread = QThread::create([this]{ updateWindow(); });
     windowThread->start();
     control->launch();
+
+    ui->startButton->setEnabled(false);
+    ui->pauseButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+    ui->menuButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +51,10 @@ void MainWindow::handleMenuButton(){
     ui->mainMenu->addItem("SESSION LOG");
     ui->mainMenu->addItem("TIME AND DATE");
     ui->mainMenu->setCurrentRow(0);
+    ui->startButton->setEnabled(false);
+    ui->pauseButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+    ui->menuButton->setEnabled(false);
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
@@ -118,6 +127,12 @@ void MainWindow::handlePowerButton(){
 
 void MainWindow::handleStartButton(){
     //functionality
+
+    ui->startButton->setEnabled(false);
+    ui->stopButton->setEnabled(true);
+    ui->pauseButton->setEnabled(true);
+    ui->menuButton->setEnabled(false);
+
     qInfo()<< "start button pressed";
     emit startButtonPressed();
 }
@@ -135,6 +150,8 @@ void MainWindow::handleSelectButton(){
     if(selection == "NEW SESSION")
     {
         ui->sessionFrame->setVisible(true);
+        ui->menuButton->setEnabled(true);
+        ui->startButton->setEnabled(true);
     }
     else if(selection == "SESSION LOG")
     {
@@ -142,6 +159,7 @@ void MainWindow::handleSelectButton(){
         ui->mainMenu->addItem("UPLOAD");
         ui->mainMenu->addItem("BACK");
         ui->mainMenu->setCurrentRow(0);
+        ui->menuButton->setEnabled(true);
     }
     else if(selection == "TIME AND DATE")
     {
@@ -149,6 +167,7 @@ void MainWindow::handleSelectButton(){
         ui->mainMenu->addItem("CONFIRM");
         ui->mainMenu->setCurrentRow(0);
         ui->dateFrame->setVisible(true);
+        ui->menuButton->setEnabled(true);
     }
     else if(selection == "BACK" || selection == "CONFIRM")
     {
@@ -157,6 +176,7 @@ void MainWindow::handleSelectButton(){
         ui->mainMenu->addItem("SESSION LOG");
         ui->mainMenu->addItem("TIME AND DATE");
         ui->mainMenu->setCurrentRow(0);
+        ui->menuButton->setEnabled(false);
 
         if(selection == "CONFIRM")
         {
@@ -183,19 +203,6 @@ void MainWindow::updateWindow(){
         ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
-
-        if(ui->sessionFrame->isVisible())
-        {
-            ui->startButton->setEnabled(true);
-            ui->stopButton->setEnabled(true);
-            ui->pauseButton->setEnabled(true);
-        }
-        else
-        {
-            ui->startButton->setEnabled(false);
-            ui->stopButton->setEnabled(false);
-            ui->pauseButton->setEnabled(false);
-        }
 
         control->getNeureset()->getMutex()->unlock();
     }
@@ -250,4 +257,12 @@ void MainWindow::handleBattery0Button()
 {
     control->getNeureset()->setBattery(0);
     ui->batteryBar->setValue(0);
+}
+
+void MainWindow::sessionComplete()
+{
+    ui->startButton->setEnabled(true);
+    ui->pauseButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+    ui->menuButton->setEnabled(true);
 }

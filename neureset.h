@@ -29,6 +29,7 @@ public:
 signals:
     void uploadData(QVector<Session*> sessions);
     void connectionLost();
+    void sessionComplete();
 
 public slots:
     void menuButtonPressed();

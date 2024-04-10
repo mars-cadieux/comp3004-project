@@ -40,6 +40,7 @@ signals:
 
 public slots:
     void turnOff();
+    void sessionComplete();
 
 private slots:
     void handleMenuButton();

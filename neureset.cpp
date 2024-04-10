@@ -136,12 +136,6 @@ void Neureset::receiveDataRequest()
 }
 
 void Neureset::decreaseBattery(int decreaseAmount) {
-
-    if(battery < 0)
-    {
-        battery = 0;
-    }
-
     mutex.lock();
 
     if(power)
@@ -155,6 +149,7 @@ void Neureset::decreaseBattery(int decreaseAmount) {
         }
         else if(battery <= 0)
         {
+            battery = 0;
             shutDown();
         }
     }
@@ -221,6 +216,7 @@ void Neureset::baselineReceived()
         mutex.unlock();
         //decrease battery by 5% every session
         decreaseBattery(5);
+        emit sessionComplete();
     }
 }
 
