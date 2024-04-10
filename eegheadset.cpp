@@ -74,6 +74,7 @@ void EEGHeadset::measureBaseline() {
 //Begins treatment with offset frequency counted from Neureset class
 void EEGHeadset::beginTreatment(int count) {
     for (int i = 0; i < NUM_ELECTRODES; i++) {
+
         //electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5), i + 1);
         //changed electrode class so they each have an id and changed function signature so that we print the electrode's id instead of passing in the counter. -mars
         electrodes[i]->applyOffsetFrequency(dominantFrequencies[i] + (count*5));
@@ -114,7 +115,7 @@ float EEGHeadset::getBaseline() const
 
 void EEGHeadset::calculateDominantFreq(const QString& s)
 {
-    qInfo("in calculateDominantFreq");
+    //qInfo("in calculateDominantFreq");
     Electrode* e = getElectrodeById(s);
     int elecId = e->getId();
     QVector<Sinewave> brainwave = e->getBrainwave();
@@ -137,6 +138,8 @@ void EEGHeadset::calculateDominantFreq(const QString& s)
     //Storing the dominant frequencies
     dominantFrequencies[elecId] = weightedFrequencySum / sumsSquared;
 
+    //qInfo("Dominant frequency for electrode %d: %f",  elecId,  dominantFrequencies[elecId]);
+
     if(allDone()){
         calculateBaseline();
     }
@@ -144,7 +147,7 @@ void EEGHeadset::calculateDominantFreq(const QString& s)
 
 void EEGHeadset::calculateBaseline()
 {
-    qInfo("in calculateBaseline");
+    //qInfo("in calculateBaseline");
     float sum = 0.0;
 
     //Can modify this for more dynamic number of electrodes

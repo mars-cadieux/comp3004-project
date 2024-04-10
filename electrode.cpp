@@ -14,7 +14,7 @@ void Electrode::receiveBrainwave() {
     //Clear any previous brainwaves
     brainwave.clear();
 
-    qInfo("Electrode %d reading brainwave... ", id);
+    //qInfo("Electrode %d reading brainwave... ", id);
 
     //Frequency ranges for delta, theta, alpha, beta
     float frequencies[4][2] = {
@@ -44,13 +44,21 @@ void Electrode::receiveBrainwave() {
 
         brainwave.push_back({frequency, amplitude});
     }
-    qInfo("end of receiveBrainwave()");
+    //qInfo("end of receiveBrainwave()");
     //Can remove this emit part here and in header files
     //emit sendBrainwave(brainwave);
 }
 
 void Electrode::applyOffsetFrequency(float frequency) {
+    zapThread = QThread::create([this, frequency]{ zap(frequency); });
+    zapThread->start();
+}
+
+void Electrode::zap(float frequency)
+{
+    zapThread->sleep(1);
     qInfo("Signal has been emitted at Electrode %d for a frequency of %f ", id, frequency);
+    zapThread->quit();
 }
 
 int Electrode::getId() const

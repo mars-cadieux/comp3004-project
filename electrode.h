@@ -20,6 +20,7 @@ public:
     explicit Electrode(QObject *parent = nullptr);
     void receiveBrainwave();
     void applyOffsetFrequency(float frequency);
+    void zap(float frequency = 0.0);
 
     int getId() const;
     QVector<Sinewave> getBrainwave() const;
@@ -29,6 +30,8 @@ private:
     QVector<Sinewave> brainwave;
     const int id;
     static int nextID;
+
+    QThread* zapThread;
 
 signals:
     void sendBrainwave(QVector<Sinewave> brainwave);

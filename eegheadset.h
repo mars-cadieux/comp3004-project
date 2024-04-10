@@ -26,11 +26,12 @@ public:
 
 private:
     QVector<Electrode*> electrodes;
-    QVector<QThread*> electrodeThreads;
+    QThread* electrodeThreads[NUM_ELECTRODES];
     //Fixed size frequencies, changes can be made and discussed
     float frequenciesHz[NUM_ELECTRODES][4];
     float dominantFrequencies[NUM_ELECTRODES];
     float baseline;
+
 
 signals:
     void sendBaseline();
