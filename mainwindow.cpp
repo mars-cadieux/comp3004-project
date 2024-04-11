@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include "session.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -202,6 +203,9 @@ void MainWindow::updateWindow(){
         ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
         ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
+        //Session* s = control->getNeureset()->getCurrentSession();
+        //float prog = s->getProgress();
+        ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();

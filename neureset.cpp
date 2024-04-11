@@ -1,5 +1,5 @@
 #include "neureset.h"
-
+#include <QCoreApplication>
 
 Neureset::Neureset()
 {
@@ -13,8 +13,15 @@ Neureset::Neureset()
     disconnectTimer = new QTimer(this);
     beepTimer = new QTimer(this);
 
+    //create a thread for updating the battery so it can be done concurrently alongside other processes
     batteryThread = QThread::create([this]{ decreaseBatteryByTime(); });
     batteryThread->start();
+
+    //create a thread for updating the session progress bar
+    progressThread = QThread::create([this]{ updateProgressByTime(); });
+
+
+
     //connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
     connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
     connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
@@ -104,6 +111,8 @@ void Neureset::startSession()
     //currSession->setBaselineBefore(baselineBefore);
 
     mutex.unlock();
+
+    progressThread->start();
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -185,6 +194,21 @@ void Neureset::eraseSessionData()
     sessions.clear();
 }
 
+void Neureset::updateProgress(int prog)
+{
+    currentSession->updateProgress(prog);
+
+}
+
+void Neureset::updateProgressByTime()
+{
+    while(progressThread->isRunning())
+    {
+        progressThread->sleep(1);
+        updateProgress(2);
+    }
+}
+
 void Neureset::beep()
 {
     qInfo("*BEEP*");
@@ -196,6 +220,7 @@ void Neureset::baselineReceived()
     //get the baseline from the headset
     float base = headset.getBaseline();
     baselines.push_back(base);
+    updateProgress(10);
 
     //we calculate one baseline before each round of treatment (and there are 4 rounds) + a final "after" baseline. if we have less than 5 baselines in our vector, we are not done treatment
     if(baselines.size() < 5){
@@ -204,19 +229,28 @@ void Neureset::baselineReceived()
         //do the treatment
         qInfo("\nTreatment round %d ",i);
         headset.beginTreatment(i);
+        //updateProgress(10);
+
 
         //measure the baseline for the next round
         headset.measureBaseline();
     }
     //otherwise, we have just calculated the final baseline. store received baseline in the afterBaseline variable and finish the session
-    else{
+    else if (baselines.size() == 5){
         currentSession->setBaselineBefore(baselines[0]);
         currentSession->setBaselineAfter(base);
         currentSession->print();
 
+
+
         mutex.unlock();
-        //decrease battery by 5% every session
-        decreaseBattery(5);
+        //decrease battery by 10% every session
+        decreaseBattery(10);
+        //session is now done
+        updateProgress(100);
+        progressThread->quit();
+
+
         emit sessionComplete();
     }
 }
@@ -230,4 +264,24 @@ void Neureset::setBattery(int percent)
 QMutex* Neureset::getMutex()
 {
     return &mutex;
+}
+
+float Neureset::getCurrSessionProgress()
+{
+    if(sessions.size() == 0){
+        return 0;
+    }
+    else{
+        return currentSession->getProgress();
+    }
+}
+
+
+//adds a delay for the specified number of seconds
+void Neureset::delay(int seconds)
+{
+    QTime dieTime = QTime::currentTime().addSecs(seconds);
+    while (QTime::currentTime() < dieTime){
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
 }

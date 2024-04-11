@@ -15,11 +15,13 @@ public:
     float getBaselineBefore() const;
     float getBaselineAfter() const;
     bool isUploaded() const;
+    float getProgress() const;
 
     void setDateTime(QDateTime dt);
     void setBaselineBefore(float bBefore);
     void setBaselineAfter(float bAfter);
     void setuploaded(bool u);
+    void updateProgress(int prog);
 
     void print() const;
 
@@ -30,6 +32,7 @@ private:
     float beforeBaseline;
     float afterBaseline;
     bool uploaded;
+    float progress;
 };
 
 #endif // SESSION_H

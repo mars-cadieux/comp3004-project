@@ -5,6 +5,7 @@ Session::Session(QObject *parent, QDateTime dt)
 {
     beforeBaseline = 0.0;
     afterBaseline = 0.0;
+    progress = 0.0;
 }
 
 //custom copy ctor used when making a deep copy of a session which gets uploaded to the PC. Note that this ctor always sets uploaded to true; this ctor should only be used for uploading
@@ -33,6 +34,11 @@ bool Session::isUploaded() const
     return uploaded;
 }
 
+float Session::getProgress() const
+{
+    return progress;
+}
+
 void Session::setDateTime(QDateTime dt)
 {
     dateTime = dt;
@@ -51,6 +57,16 @@ void Session::setBaselineAfter(float bAfter)
 void Session::setuploaded(bool u)
 {
     uploaded = u;
+}
+
+void Session::updateProgress(int prog)
+{
+    if(progress + prog > 100){
+        progress = 100;
+    }
+    else{
+        progress += prog;
+    }
 }
 
 void Session::print() const

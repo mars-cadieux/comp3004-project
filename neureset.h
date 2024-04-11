@@ -6,7 +6,7 @@
 #include <QThread>
 
 #include "eegheadset.h"
-#include "electrode.h" //I don't think the neureset should have direct access to the electrodes, the headset should be a mediator between the two and the neureset shouldn't be aware of the electrodes existence. open to discussion though ofc. -mars
+#include "electrode.h"
 #include "session.h"
 #include "devicelight.h"
 #include <QTimer>
@@ -25,6 +25,9 @@ public:
     DeviceLight* getTSLight();
     void setBattery(int percent);
     QMutex* getMutex();
+    float getCurrSessionProgress();
+
+
 
 signals:
     void uploadData(QVector<Session*> sessions);
@@ -44,6 +47,7 @@ public slots:
     void reconnectButtonPressed();
     float getBattery();
     void beep();
+
 
     void baselineReceived();
 
@@ -67,6 +71,7 @@ private:
     bool power;
     QMutex mutex;
     QThread* batteryThread;
+    QThread* progressThread;
 
     void startSession();
     float measureBaseline();
@@ -79,6 +84,9 @@ private:
     void decreaseBatteryByTime();
     void shutDown();
     void eraseSessionData();
+    void updateProgress(int prog);
+    void updateProgressByTime();
+    void delay(int seconds);
 };
 
 #endif // NEURESET_H
