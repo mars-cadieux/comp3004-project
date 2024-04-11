@@ -48,9 +48,9 @@ public slots:
     void reconnectButtonPressed();
     float getBattery();
     void beep();
+
+
     void updateSessionTime();
-
-
     void baselineReceived();
 
 private:
