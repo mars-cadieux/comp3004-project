@@ -206,6 +206,7 @@ void MainWindow::updateWindow(){
         //Session* s = control->getNeureset()->getCurrentSession();
         //float prog = s->getProgress();
         ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
+        ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();

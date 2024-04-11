@@ -26,6 +26,7 @@ public:
     void setBattery(int percent);
     QMutex* getMutex();
     float getCurrSessionProgress();
+    QString getCurrSessionTime();
 
 
 
@@ -47,6 +48,7 @@ public slots:
     void reconnectButtonPressed();
     float getBattery();
     void beep();
+    void updateSessionTime();
 
 
     void baselineReceived();
@@ -67,6 +69,8 @@ private:
     QTimer* batteryTimer;
     QTimer* disconnectTimer;
     QTimer* beepTimer;
+    QTimer* sessionTimer;
+    int sessionTime;
     bool contact;
     bool power;
     QMutex mutex;

@@ -7,11 +7,13 @@ Neureset::Neureset()
     contactLight = new DeviceLight();
     tsLight = new DeviceLight();
     battery = 100;
+    sessionTime = 0;
 
     //timer to decrease battery life by 1 percent every 10 seconds
     //batteryTimer = new QTimer(this);
     disconnectTimer = new QTimer(this);
     beepTimer = new QTimer(this);
+    sessionTimer = new QTimer(this);
 
     //create a thread for updating the battery so it can be done concurrently alongside other processes
     batteryThread = QThread::create([this]{ decreaseBatteryByTime(); });
@@ -25,6 +27,7 @@ Neureset::Neureset()
     //connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
     connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
     connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
+    connect(sessionTimer, &QTimer::timeout, this, &Neureset::updateSessionTime);
     //batteryTimer->start(10000); // 10 seconds
     contact = true;
     power = true;
@@ -113,6 +116,8 @@ void Neureset::startSession()
     mutex.unlock();
 
     progressThread->start();
+    sessionTime = 0;
+    sessionTimer->start(1000);
 }
 
 DeviceLight* Neureset::getConnLight()
@@ -209,6 +214,18 @@ void Neureset::updateProgressByTime()
     }
 }
 
+void Neureset::updateSessionTime()
+{
+    sessionTime += 1;
+}
+
+QString Neureset::getCurrSessionTime()
+{
+    int seconds = sessionTime % 60;
+    int minutes = (sessionTime - seconds) / 60;
+    return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
+}
+
 void Neureset::beep()
 {
     qInfo("*BEEP*");
@@ -249,7 +266,7 @@ void Neureset::baselineReceived()
         //session is now done
         updateProgress(100);
         progressThread->quit();
-
+        sessionTimer->stop();
 
         emit sessionComplete();
     }
