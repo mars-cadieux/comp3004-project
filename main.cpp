@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "mainwindow.h"
 
 #include <bits/stdc++.h> //idk if we're allowed to use this, needed for random number generation -mars
 #include <QApplication>

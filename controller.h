@@ -2,7 +2,6 @@
 #define CONTROLLER_H
 
 #include "neureset.h"
-#include "mainwindow.h"
 #include "pcsoftware.h"
 
 #include <QObject>
