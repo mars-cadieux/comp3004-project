@@ -5,11 +5,13 @@
 #include <QDateTime>
 #include "controller.h"
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class Controller;
+struct Sinewave;
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +21,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void updateWindow();
+
 
 private:
     Ui::MainWindow *ui;
@@ -37,10 +40,12 @@ signals:
     void selectButtonPressed();
     void disconnectButtonPressed();
     void reconnectButtonPressed();
+    void showWaveform(const QString& elecNum);
 
 public slots:
     void turnOff();
     void sessionComplete();
+    void updateGraph(QVector<Sinewave> bWave);
 
 private slots:
     void handleMenuButton();
@@ -55,5 +60,6 @@ private slots:
     void handleReconnectButton();
     void handleBattery10Button();
     void handleBattery0Button();
+    void on_showWaveformButton_released();
 };
 #endif // MAINWINDOW_H

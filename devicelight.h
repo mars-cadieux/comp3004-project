@@ -1,7 +1,7 @@
 #ifndef DEVICELIGHT_H
 #define DEVICELIGHT_H
 
-#import <QThread>
+#include <QThread>
 
 class DeviceLight
 {

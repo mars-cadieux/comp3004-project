@@ -33,6 +33,7 @@ signals:
     void uploadData(QVector<Session*> sessions);
     void connectionLost();
     void sessionComplete();
+    void sendBrainwave(QVector<Sinewave> bWave);
 
 public slots:
     void menuButtonPressed();
@@ -47,6 +48,7 @@ public slots:
     void reconnectButtonPressed();
     float getBattery();
     void beep();
+    void waveformRequested(const QString& elecNum);
 
 
     void baselineReceived();

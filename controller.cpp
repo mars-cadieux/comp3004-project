@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "mainwindow.h"
 
 Controller::Controller(MainWindow* w, QObject *parent)
     : QObject{parent}
@@ -22,6 +23,10 @@ void Controller::launch(){
     QObject::connect(window, &MainWindow::selectButtonPressed, &neureset, &Neureset::selectButtonPressed);
     QObject::connect(window, &MainWindow::disconnectButtonPressed, &neureset, &Neureset::disconnectButtonPressed);
     QObject::connect(window, &MainWindow::reconnectButtonPressed, &neureset, &Neureset::reconnectButtonPressed);
+
+    //connect signals and slots for plotting the waveforms
+    QObject::connect(window, &MainWindow::showWaveform, &neureset, &Neureset::waveformRequested);
+    QObject::connect(&neureset, &Neureset::sendBrainwave, window, &MainWindow::updateGraph);
 
     QObject::connect(&neureset, &Neureset::connectionLost, window, &MainWindow::turnOff);
     QObject::connect(&neureset, &Neureset::sessionComplete, window, &MainWindow::sessionComplete);
