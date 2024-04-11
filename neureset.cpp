@@ -215,6 +215,14 @@ void Neureset::beep()
     beepTimer->start(2000);
 }
 
+void Neureset::waveformRequested(const QString &elecNum)
+{
+    qInfo("in waveformRequested");
+    Electrode* elec = headset.getElectrodeById(elecNum);
+    QVector<Sinewave> bWave = elec->getBrainwave();
+    emit sendBrainwave(bWave);
+}
+
 void Neureset::baselineReceived()
 {
     //get the baseline from the headset

@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(false);
+
 }
 
 MainWindow::~MainWindow()
@@ -203,13 +204,77 @@ void MainWindow::updateWindow(){
         ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
         ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
-        //Session* s = control->getNeureset()->getCurrentSession();
-        //float prog = s->getProgress();
         ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();
     }
+}
+
+void MainWindow::updateGraph(QVector<Sinewave> bWave)
+{
+    //if the electrode has measured a brainwave, the bWave vector will be non-empty and we want to update the graph. Otherwise, do nothing
+    if(bWave.size() > 0){
+        ui->customPlot->addGraph();
+        ui->customPlot->graph(0)->setPen(QPen(Qt::blue)); // line color blue
+
+        // generate some points of data
+        QVector<double> x(51), y(51);
+        //this temp value will be used to accumulate all of the sine waves
+        double temp = 0;
+
+        for (int i=0; i<51; ++i)
+        {
+          // x-axis will go from 0 to 1
+          x[i] = i/50.0;
+          //the EEG waveform will be the sum of all four brainwaves (alpha, beta, delta, theta). loop through all brainwaves and sum their values
+          //recall that the formula for a sinwave (in terms of i) is (amplitude)*(sin((frequency)*i))
+          for(int j=0; j<bWave.size(); ++j){
+              //qInfo("Amp: %f", bWave[j].amplitude); //debugging
+              //qInfo("Freq: %f", bWave[j].frequency); //debugging
+              temp += (bWave[j].amplitude)*qSin((bWave[j].frequency)*i);
+          }
+          y[i] = temp;
+
+        }
+        ui->customPlot->graph(0)->setData(x, y);
+
+        // let the ranges scale themselves so graph 0 fits perfectly in the visible area:
+        ui->customPlot->graph(0)->rescaleAxes();
+        //hide the labels (x-values) along the x-axis
+        ui->customPlot->xAxis->setTickLabels(false);
+
+        ui->customPlot->replot();
+    }
+
+
+//    // add two new graphs and set their look:
+//    ui->customPlot->addGraph();
+//    ui->customPlot->graph(0)->setPen(QPen(Qt::blue)); // line color blue for first graph
+//    ui->customPlot->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20))); // first graph will be filled with translucent blue
+//    ui->customPlot->addGraph();
+//    ui->customPlot->graph(1)->setPen(QPen(Qt::red)); // line color red for second graph
+
+//    // configure right and top axis to show ticks but no labels:
+//    // (see QCPAxisRect::setupFullAxesBox for a quicker method to do this)
+//    ui->customPlot->xAxis2->setVisible(true);
+//    ui->customPlot->xAxis2->setTickLabels(false);
+//    ui->customPlot->yAxis2->setVisible(true);
+//    ui->customPlot->yAxis2->setTickLabels(false);
+//    // make left and bottom axes always transfer their ranges to right and top axes:
+//    connect(ui->customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->xAxis2, SLOT(setRange(QCPRange)));
+//    connect(ui->customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->yAxis2, SLOT(setRange(QCPRange)));
+//    // pass data points to graphs:
+
+
+//    // let the ranges scale themselves so graph 0 fits perfectly in the visible area:
+//    ui->customPlot->graph(0)->rescaleAxes();
+//    // same thing for graph 1, but only enlarge ranges (in case graph 1 is smaller than graph 0):
+//    ui->customPlot->graph(1)->rescaleAxes(true);
+//    // Note: we could have also just called ui->customPlot->rescaleAxes(); instead
+//    // Allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking:
+//    ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+//    ui->customPlot->replot();
 }
 
 void MainWindow::handleDisconnectButton(){
@@ -270,3 +335,11 @@ void MainWindow::sessionComplete()
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(true);
 }
+
+void MainWindow::on_showWaveformButton_released()
+{
+    int elecNum = ui->electrodeSelector->value();
+    emit showWaveform(QString::number(elecNum));
+    qInfo("show waveform clicked");
+}
+
