@@ -103,6 +103,7 @@ void Neureset::startSession()
     headset.measureBaseline();
     //currSession->setBaselineBefore(baselineBefore);
 
+    mutex.unlock();
 }
 
 DeviceLight* Neureset::getConnLight()
