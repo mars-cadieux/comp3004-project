@@ -207,6 +207,7 @@ void MainWindow::updateWindow(){
         ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
+        ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
         ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();
