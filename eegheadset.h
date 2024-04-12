@@ -36,10 +36,12 @@ private:
 signals:
     void sendBaseline();
     void allFrequenciesReceived();
+    void updateSessionPaused(bool sessionPaused);
 
 public slots:
     void calculateDominantFreq(const QString& s);
     void calculateBaseline();
+    void recieveSessionPaused(bool sessionPaused);
 
 };
 

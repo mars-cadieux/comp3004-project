@@ -63,6 +63,7 @@ void EEGHeadset::measureBaseline() {
         //make a new thread and offload the work of this function to said thread
         ElectrodeThread* elecThread = new ElectrodeThread(this, electrodes[i]);
         QObject::connect(elecThread, &ElectrodeThread::resultReady, this, &EEGHeadset::calculateDominantFreq);
+        QObject::connect(this, &EEGHeadset::updateSessionPaused, elecThread, &ElectrodeThread::updateSessionPaused);
         QObject::connect(elecThread, &ElectrodeThread::finished, elecThread, &QObject::deleteLater);
         elecThread->start();
 
@@ -159,3 +160,7 @@ void EEGHeadset::calculateBaseline()
     //return overallBaseline;
 }
 
+void EEGHeadset::recieveSessionPaused(bool sessionPaused){
+    emit updateSessionPaused(sessionPaused);
+
+}

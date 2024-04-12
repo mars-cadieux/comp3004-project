@@ -33,6 +33,7 @@ Neureset::Neureset()
     power = true;
 
     QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
+    connect(this, &Neureset::updateSessionPaused, &headset, &EEGHeadset::recieveSessionPaused);
 }
 
 Neureset::~Neureset()
@@ -61,6 +62,8 @@ void Neureset::upButtonPressed(){
 
 void Neureset::pauseButtonPressed(){
     qInfo("pauseButtonPressed from neureset class");
+    sessionsPaused = true;
+    emit updateSessionPaused(sessionsPaused);
 }
 
 void Neureset::powerButtonPressed(){
@@ -71,6 +74,8 @@ void Neureset::powerButtonPressed(){
 void Neureset::startButtonPressed(){
     qInfo("startButtonPressed from neureset class");
     //add handling so that this function only starts the session if "new session" is currently selected
+    sessionsPaused = false;
+    emit updateSessionPaused(sessionsPaused);
     startSession();
 }
 
