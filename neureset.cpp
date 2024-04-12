@@ -160,6 +160,9 @@ void Neureset::decreaseBattery(int decreaseAmount) {
         else if(battery <= 0)
         {
             battery = 0;
+            beepTimer->stop();
+            disconnectTimer->stop();
+            mutex.unlock();
             shutDown();
         }
     }
@@ -184,8 +187,8 @@ void Neureset::shutDown()
     eraseSessionData();
     power = false;
     //batteryTimer->stop();
-    beepTimer->stop();
-    disconnectTimer->stop();
+    //beepTimer->stop();
+    //disconnectTimer->stop();
     emit connectionLost();
 }
 
@@ -196,8 +199,9 @@ void Neureset::eraseSessionData()
 
 void Neureset::updateProgress(int prog)
 {
+    mutex.lock();
     currentSession->updateProgress(prog);
-
+    mutex.unlock();
 }
 
 void Neureset::updateProgressByTime()
@@ -217,7 +221,7 @@ void Neureset::beep()
 
 void Neureset::waveformRequested(const QString &elecNum)
 {
-    qInfo("in waveformRequested");
+    //qInfo("in waveformRequested");
     Electrode* elec = headset.getElectrodeById(elecNum);
     QVector<Sinewave> bWave = elec->getBrainwave();
     emit sendBrainwave(bWave);
@@ -228,6 +232,8 @@ void Neureset::baselineReceived()
     //get the baseline from the headset
     float base = headset.getBaseline();
     baselines.push_back(base);
+
+    //add 10% to the session progress
     updateProgress(10);
 
     //we calculate one baseline before each round of treatment (and there are 4 rounds) + a final "after" baseline. if we have less than 5 baselines in our vector, we are not done treatment
@@ -237,8 +243,6 @@ void Neureset::baselineReceived()
         //do the treatment
         qInfo("\nTreatment round %d ",i);
         headset.beginTreatment(i);
-        //updateProgress(10);
-
 
         //measure the baseline for the next round
         headset.measureBaseline();
@@ -249,15 +253,14 @@ void Neureset::baselineReceived()
         currentSession->setBaselineAfter(base);
         currentSession->print();
 
-
-
         mutex.unlock();
+
         //decrease battery by 10% every session
         decreaseBattery(10);
-        //session is now done
+
+        //session is now done, top off progress to 100%
         updateProgress(100);
         progressThread->quit();
-
 
         emit sessionComplete();
     }
@@ -276,7 +279,7 @@ QMutex* Neureset::getMutex()
 
 float Neureset::getCurrSessionProgress()
 {
-    if(sessions.size() == 0){
+    if(sessions.size() == 0 || currentSession == nullptr){
         return 0;
     }
     else{
