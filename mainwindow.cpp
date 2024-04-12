@@ -94,7 +94,9 @@ void MainWindow::handleNavigateUp(){
 }
 
 void MainWindow::handlePauseButton(){
-    //functionality
+
+    ui->startButton->setEnabled(true);
+    ui->pauseButton->setEnabled(false);
     qInfo()<< "pause button pressed";
     emit pauseButtonPressed();
 }

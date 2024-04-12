@@ -63,6 +63,7 @@ void Neureset::upButtonPressed(){
 void Neureset::pauseButtonPressed(){
     qInfo("pauseButtonPressed from neureset class");
     sessionsPaused = true;
+    sessionTimer->stop();
     emit updateSessionPaused(sessionsPaused);
 }
 
@@ -72,10 +73,20 @@ void Neureset::powerButtonPressed(){
 }
 
 void Neureset::startButtonPressed(){
+    mutex.lock();
     qInfo("startButtonPressed from neureset class");
     //add handling so that this function only starts the session if "new session" is currently selected
+    if(sessionsPaused){
+        sessionsPaused = false;
+        sessionTimer->start();
+        emit updateSessionPaused(sessionsPaused);
+        mutex.unlock();
+        return;
+    }
+
     sessionsPaused = false;
     emit updateSessionPaused(sessionsPaused);
+    mutex.unlock();
     startSession();
 }
 
@@ -218,6 +229,9 @@ void Neureset::updateProgressByTime()
 {
     while(progressThread->isRunning())
     {
+        if(sessionsPaused){
+            continue;
+        }
         progressThread->sleep(1);
         updateProgress(2);
     }
