@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(false);
 
+    ui->customPlot->addGraph();
+
 }
 
 MainWindow::~MainWindow()
@@ -216,7 +218,7 @@ void MainWindow::updateGraph(QVector<Sinewave> bWave)
 {
     //if the electrode has measured a brainwave, the bWave vector will be non-empty and we want to update the graph. Otherwise, do nothing
     if(bWave.size() > 0){
-        ui->customPlot->addGraph();
+
         ui->customPlot->graph(0)->setPen(QPen(Qt::blue)); // line color blue
 
         // generate some points of data
@@ -247,35 +249,6 @@ void MainWindow::updateGraph(QVector<Sinewave> bWave)
 
         ui->customPlot->replot();
     }
-
-
-//    // add two new graphs and set their look:
-//    ui->customPlot->addGraph();
-//    ui->customPlot->graph(0)->setPen(QPen(Qt::blue)); // line color blue for first graph
-//    ui->customPlot->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20))); // first graph will be filled with translucent blue
-//    ui->customPlot->addGraph();
-//    ui->customPlot->graph(1)->setPen(QPen(Qt::red)); // line color red for second graph
-
-//    // configure right and top axis to show ticks but no labels:
-//    // (see QCPAxisRect::setupFullAxesBox for a quicker method to do this)
-//    ui->customPlot->xAxis2->setVisible(true);
-//    ui->customPlot->xAxis2->setTickLabels(false);
-//    ui->customPlot->yAxis2->setVisible(true);
-//    ui->customPlot->yAxis2->setTickLabels(false);
-//    // make left and bottom axes always transfer their ranges to right and top axes:
-//    connect(ui->customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->xAxis2, SLOT(setRange(QCPRange)));
-//    connect(ui->customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->yAxis2, SLOT(setRange(QCPRange)));
-//    // pass data points to graphs:
-
-
-//    // let the ranges scale themselves so graph 0 fits perfectly in the visible area:
-//    ui->customPlot->graph(0)->rescaleAxes();
-//    // same thing for graph 1, but only enlarge ranges (in case graph 1 is smaller than graph 0):
-//    ui->customPlot->graph(1)->rescaleAxes(true);
-//    // Note: we could have also just called ui->customPlot->rescaleAxes(); instead
-//    // Allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking:
-//    ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-//    ui->customPlot->replot();
 }
 
 void MainWindow::handleDisconnectButton(){
@@ -341,6 +314,5 @@ void MainWindow::on_showWaveformButton_released()
 {
     int elecNum = ui->electrodeSelector->value();
     emit showWaveform(QString::number(elecNum));
-    qInfo("show waveform clicked");
 }
 
