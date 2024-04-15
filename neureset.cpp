@@ -130,7 +130,8 @@ void Neureset::startSession()
     //currSession->setBaselineBefore(baselineBefore);
 
     mutex.unlock();
-
+    delete progressThread;
+    progressThread = QThread::create([this]{ updateProgressByTime(); });
     progressThread->start();
     sessionTime = 0;
     sessionTimer->start(1000);
@@ -220,14 +221,12 @@ void Neureset::eraseSessionData()
 
 void Neureset::updateProgress(int prog)
 {
-    mutex.lock();
     currentSession->updateProgress(prog);
-    mutex.unlock();
 }
 
 void Neureset::updateProgressByTime()
 {
-    while(progressThread->isRunning())
+    while(progressThread->isRunning() && !progressThread->isInterruptionRequested())
     {
         if(sessionsPaused){
             continue;
@@ -235,6 +234,8 @@ void Neureset::updateProgressByTime()
         progressThread->sleep(1);
         updateProgress(2);
     }
+
+    progressThread->quit();
 }
 
 void Neureset::updateSessionTime()
@@ -244,9 +245,14 @@ void Neureset::updateSessionTime()
 
 QString Neureset::getCurrSessionTime()
 {
-    int seconds = sessionTime % 60;
-    int minutes = (sessionTime - seconds) / 60;
-    return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
+    if(currentSession != nullptr)
+    {
+        int seconds = sessionTime % 60;
+        int minutes = (sessionTime - seconds) / 60;
+        return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
+    }
+
+    return QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0'));
 }
 
 void Neureset::beep()
@@ -285,21 +291,20 @@ void Neureset::baselineReceived()
     }
     //otherwise, we have just calculated the final baseline. store received baseline in the afterBaseline variable and finish the session
     else if (baselines.size() == 5){
+        //decrease battery by 10% every session
+        decreaseBattery(10);
+
         currentSession->setBaselineBefore(baselines[0]);
         currentSession->setBaselineAfter(base);
         currentSession->print();
 
         mutex.unlock();
 
-        //decrease battery by 10% every session
-        decreaseBattery(10);
-
         //session is now done, top off progress to 100%
+        progressThread->requestInterruption();
         updateProgress(100);
-        progressThread->quit();
 
         sessionTimer->stop();
-
 
         emit sessionComplete();
     }
