@@ -17,8 +17,18 @@ void ElectrodeThread::run()
 
     //using a 5 second delay
     delay(5);
+
+    if(sessionStopped_){
+        return;
+    }
+
     while(sessionPaused_){
-        qInfo("session paused");
+        qInfo("session paused"); // keep session paused while true
+
+        if(sessionStopped_){     // check if stopped too
+            return;
+        }
+
         delay(1);
     }
     electrode->receiveBrainwave(); //the brainwave will be stored in the electrode object
@@ -38,6 +48,10 @@ void ElectrodeThread::delay(int seconds)
 
 void ElectrodeThread::updateSessionPaused(bool sessionPaused){
     sessionPaused_ = sessionPaused;
+}
+
+void ElectrodeThread::updateSessionStopped(bool sessionStopped){
+    sessionStopped_ = sessionStopped;
 }
 
 

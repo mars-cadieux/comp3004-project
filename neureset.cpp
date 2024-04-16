@@ -34,6 +34,7 @@ Neureset::Neureset()
 
     QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
     connect(this, &Neureset::updateSessionPaused, &headset, &EEGHeadset::recieveSessionPaused);
+    connect(this, &Neureset::updateSessionStopped, &headset, &EEGHeadset::recieveSessionStopped);
 }
 
 Neureset::~Neureset()
@@ -78,6 +79,7 @@ void Neureset::startButtonPressed(){
     //add handling so that this function only starts the session if "new session" is currently selected
     if(sessionsPaused){
         sessionsPaused = false;
+        sessionStopped = false;
         sessionTimer->start();
         emit updateSessionPaused(sessionsPaused);
         mutex.unlock();
@@ -85,13 +87,23 @@ void Neureset::startButtonPressed(){
     }
 
     sessionsPaused = false;
+    sessionStopped = false;
     emit updateSessionPaused(sessionsPaused);
     mutex.unlock();
     startSession();
 }
 
 void Neureset::stopButtonPressed(){
+    mutex.lock();
     qInfo("stopButtonPressed from neureset class");
+    sessionStopped = true;
+
+    sessionTimer->stop();
+    emit updateSessionStopped(sessionStopped);
+    sessions.pop_back();                // remove current session data
+    progressThread->requestInterruption(); // stop progress thread
+    progressThread->quit();
+    mutex.unlock();
 }
 
 void Neureset::selectButtonPressed(){
@@ -228,7 +240,7 @@ void Neureset::updateProgressByTime()
 {
     while(progressThread->isRunning() && !progressThread->isInterruptionRequested())
     {
-        if(sessionsPaused){
+        if(sessionsPaused || sessionStopped){
             continue;
         }
         progressThread->sleep(1);

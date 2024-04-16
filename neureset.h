@@ -35,6 +35,7 @@ signals:
     void connectionLost();
     void sessionComplete();
     void updateSessionPaused(bool sessionPaused);
+    void updateSessionStopped(bool sessionStopped);
     void sendBrainwave(QVector<Sinewave> bWave);
 
 public slots:
@@ -77,6 +78,7 @@ private:
     bool contact;
     bool power;
     bool sessionsPaused;
+    bool sessionStopped;
     QMutex mutex;
     QThread* batteryThread;
     QThread* progressThread;

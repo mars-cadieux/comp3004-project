@@ -22,9 +22,11 @@ private:
     Electrode* electrode; //pointer to the electrode that this thread is doing the work for
     void delay(int seconds); //adds a delay, used to simulate the electrode taking 1 min to calculate frequency
     bool sessionPaused_ = false;
+    bool sessionStopped_ = false;
 
 public slots:
     void updateSessionPaused(bool sessionPaused);
+    void updateSessionStopped(bool sessionStopped);
 
 };
 

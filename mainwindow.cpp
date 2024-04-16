@@ -146,6 +146,10 @@ void MainWindow::handleStartButton(){
 void MainWindow::handleStopButton(){
     //functionality
     qInfo()<< "stop button pressed";
+    ui->startButton ->setEnabled(true);
+    ui->stopButton->setEnabled(false);
+    ui->pauseButton->setEnabled(false);
+    ui->menuButton->setEnabled(true);
     emit stopButtonPressed();
 }
 

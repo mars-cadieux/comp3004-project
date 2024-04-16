@@ -64,6 +64,7 @@ void EEGHeadset::measureBaseline() {
         ElectrodeThread* elecThread = new ElectrodeThread(this, electrodes[i]);
         QObject::connect(elecThread, &ElectrodeThread::resultReady, this, &EEGHeadset::calculateDominantFreq);
         QObject::connect(this, &EEGHeadset::updateSessionPaused, elecThread, &ElectrodeThread::updateSessionPaused);
+        QObject::connect(this, &EEGHeadset::updateSessionStopped, elecThread, &ElectrodeThread::updateSessionStopped);
         QObject::connect(elecThread, &ElectrodeThread::finished, elecThread, &QObject::deleteLater);
         elecThread->start();
 
@@ -162,5 +163,10 @@ void EEGHeadset::calculateBaseline()
 
 void EEGHeadset::recieveSessionPaused(bool sessionPaused){
     emit updateSessionPaused(sessionPaused);
+
+}
+
+void EEGHeadset::recieveSessionStopped(bool sessionStopped){
+    emit updateSessionStopped(sessionStopped);
 
 }
