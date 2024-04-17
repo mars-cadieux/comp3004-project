@@ -94,7 +94,7 @@ void MainWindow::handleNavigateUp(){
 }
 
 void MainWindow::handlePauseButton(){
-
+    // Pauses the session
     ui->startButton->setEnabled(true);
     ui->pauseButton->setEnabled(false);
     qInfo()<< "pause button pressed";
@@ -132,7 +132,7 @@ void MainWindow::handlePowerButton(){
 }
 
 void MainWindow::handleStartButton(){
-    //functionality
+    //Starts the session
 
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(true);
@@ -144,7 +144,7 @@ void MainWindow::handleStartButton(){
 }
 
 void MainWindow::handleStopButton(){
-    //functionality
+    //Stops the session
     qInfo()<< "stop button pressed";
     ui->startButton ->setEnabled(true);
     ui->stopButton->setEnabled(false);
@@ -154,7 +154,7 @@ void MainWindow::handleStopButton(){
 }
 
 void MainWindow::handleSelectButton(){
-    //functionality
+    //Sends a signal to neureset or updates UI based on current selection
     std::string selection = ui->mainMenu->currentItem()->data(Qt::DisplayRole).toString().toStdString();
 
     if(selection == "NEW SESSION")
@@ -205,6 +205,7 @@ void MainWindow::handleSelectButton(){
 }
 
 void MainWindow::updateWindow(){
+    //Updates the window to refresh UI
     while(windowThread->isRunning())
     {
         control->getNeureset()->getMutex()->lock();
@@ -258,7 +259,7 @@ void MainWindow::updateGraph(QVector<Sinewave> bWave)
 }
 
 void MainWindow::handleDisconnectButton(){
-    //functionality
+    // Disconnects the Electrodes, emits signal to neureset
     qInfo()<< "disconnect button pressed";
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
@@ -267,7 +268,7 @@ void MainWindow::handleDisconnectButton(){
 }
 
 void MainWindow::handleReconnectButton(){
-    //functionality
+    // Reconnects the Electrodes, emits signal to neureset
     qInfo()<< "reconnect button pressed";
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
@@ -298,18 +299,21 @@ void MainWindow::turnOff(){
 
 void MainWindow::handleBattery10Button()
 {
+    // Sets battery value to 10%
     control->getNeureset()->setBattery(10);
     ui->batteryBar->setValue(10);
 }
 
 void MainWindow::handleBattery0Button()
 {
+    // Sets battery value to 0%
     control->getNeureset()->setBattery(0);
     ui->batteryBar->setValue(0);
 }
 
 void MainWindow::sessionComplete()
 {
+    // Re-enables buttons on session completion.
     ui->startButton->setEnabled(true);
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
@@ -318,6 +322,7 @@ void MainWindow::sessionComplete()
 
 void MainWindow::on_showWaveformButton_released()
 {
+    // Updates waveform display
     int elecNum = ui->electrodeSelector->value();
     emit showWaveform(QString::number(elecNum));
 }

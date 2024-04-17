@@ -5,6 +5,24 @@
 #include <QThread>
 #include <QFloat16>
 
+/* ElectrodeThread Class
+ * Class Purpose: Manages runtime of an Electrode during a session so it can be easily stopped/started and delayed for treatment time
+ *
+ * Data Members:
+ * Electrode electrode: Pointer to the electrode object the thread is doing the work for
+ * sessionPaused_: true if session is paused
+ * sessionStopped_: true if session is stopped
+ *
+ * Class Functions:
+ * void run(): Runs the session process for electrode, emits signal to headset when process is finished.
+ * void delay(): Adds a delay to simulate the electrode taking the time to calculate frequency
+ *
+ * void updateSessionPaused: Updates pause status
+ * void updateSessionStopped: Updates stopped status
+ *
+ * Signals:
+ * resultReady(): Signals to headset that the electrode has calculated a result.
+ * */
 
 class Electrode;
 

@@ -6,6 +6,20 @@
 
 #include <QObject>
 
+/* Controller Class
+ * Class Purpose: Connects the Neureset UI and PCSoftware to the Neureset class, allowing easy communication through signals.
+ *
+ * Data Members:
+ * Neureset neureset: Contains the neureset object
+ * PCSoftware pcSoft: Contains the PCSoftware object
+ * MainWindow window: Contains the neureset UI
+ *
+ * Class Functions:
+ * Getters for neureset and pcSoft
+ *
+ * void launch(): Connects all signals from the neurest, pcSoft, and window to their respective slots.
+ * */
+
 class MainWindow;
 
 class Controller : public QObject
