@@ -4,6 +4,23 @@
 #include <QObject>
 #include <QDateTime>
 
+/* Session Class
+ * Class Purpose: Contains info about a neurotherapy session
+ *
+ * Data Members:
+ * QDateTime dateTime: holds the date of the session
+ * float beforeBaseline: contains baseline frequency before neurotherapy
+ * float afterBaseline: contains baseline frequency after neurotherapy
+ * bool uploaded: true if uploaded to PC, to prevent double entries
+ * float progress: current progress through session as a percentage
+ *
+ * Class Functions:
+ * Getters for dateTime, baselines, uploaded, and progress
+ * Setters for dateTime, baselines, and uploaded
+ * void updateProgress(): Adds to the session progress variable
+ * void print(): Prints a readable string of session info
+ * */
+
 class Session : public QObject
 {
     Q_OBJECT

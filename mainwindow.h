@@ -13,6 +13,25 @@ QT_END_NAMESPACE
 class Controller;
 struct Sinewave;
 
+/* MainWindow Class
+ * Class Purpose: Displays the UI for the Neureset, and sends user input to the controller.
+ *
+ * Data Members:
+ * MainWindow *ui: Pointer to UI object
+ * Controller* control: Pointer to controller object
+ * QThread windowThread: Runs the window asynchronously
+ * bool power: True if device is powered
+ *
+ * Class Functions:
+ * void updateWindow(): Runs asynchronously to continuously update the window.
+ *
+ * Slots:
+ * Private slots to handle buttons and other user input
+ * void turnOff(): Signalled by controller when power runs out, shuts down the UI
+ * void sessionComplete(): Signalled when neureset finishes a session
+ * void updateGraph(): Signalled when a wavelength is requested, updates the graph with given Sinewave.
+ * */
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

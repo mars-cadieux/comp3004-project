@@ -9,6 +9,19 @@
 class PCSoftware;
 class Session;
 
+/* PCui Class
+ * Class Purpose: Display and manage the UI for the PC.
+ *
+ * Data Members:
+ * PCui *ui: pointer to the ui
+ * PCSoftware* owner: pointer to the PCSoftware that "owns" this ui. this makes it so that the ui can comunicate to software directly instead of having to emit signals
+ * QCustomPlot* customPlot: plot object for displaying the graph
+ *
+ * Class Functions:
+ * void updateView(): Updates the view with new session data.
+ * void setupPlot(): Sets up the QCustomPlot.
+ * */
+
 namespace Ui {
 class PCui;
 }
@@ -28,7 +41,7 @@ private slots:
 private:
     Ui::PCui *ui;
 
-    PCSoftware* owner; //pointer to the PCSoftware that "owns" this ui. this makes it so that the ui can comunicate to software directly instead of having to emit signals
+    PCSoftware* owner;
     QCustomPlot*  customPlot;
 
     void setupPlot();
