@@ -161,6 +161,7 @@ private:
     void updateProgress(int prog);
     void updateProgressByTime();
     void delay(int seconds);
+    void pauseSession();
 };
 
 #endif // NEURESET_H

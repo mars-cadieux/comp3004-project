@@ -68,6 +68,21 @@ void Neureset::pauseButtonPressed(){
     emit updateSessionPaused(sessionsPaused);
 }
 
+void Neureset::pauseSession(){
+    sessionsPaused = !sessionsPaused;
+
+    if(sessionsPaused)
+    {
+        sessionTimer->stop();
+    }
+    else
+    {
+        sessionTimer->start();
+    }
+
+    emit updateSessionPaused(sessionsPaused);
+}
+
 void Neureset::powerButtonPressed(){
     power = !power;
     qInfo("powerButtonPressed from neureset class");
@@ -102,7 +117,6 @@ void Neureset::stopButtonPressed(){
     emit updateSessionStopped(sessionStopped);
     sessions.pop_back();                // remove current session data
     progressThread->requestInterruption(); // stop progress thread
-    progressThread->quit();
     mutex.unlock();
 }
 
@@ -115,6 +129,8 @@ void Neureset::disconnectButtonPressed(){
     disconnectTimer->start(10000); // 10 seconds
     beepTimer->start(2000);
     contact = false;
+
+    pauseSession();
 }
 
 void Neureset::reconnectButtonPressed(){
@@ -122,6 +138,8 @@ void Neureset::reconnectButtonPressed(){
     disconnectTimer->stop();
     beepTimer->stop();
     contact = true;
+
+    pauseSession();
 }
 
 void Neureset::startSession()
