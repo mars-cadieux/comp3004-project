@@ -72,6 +72,7 @@ Neureset::~Neureset()
 
 
 void Neureset::pauseButtonPressed(){
+    qInfo("Session paused. Device will shut off after 10 seconds of inactivity.");
     sessionsPaused = true;
     sessionTimer->stop();
     pauseTimer->start(10000);
@@ -100,6 +101,10 @@ void Neureset::powerButtonPressed(){
     {
         shutDown();
     }
+    else{
+        contact = true;
+        contactLight->setLit(contact);
+    }
 }
 
 void Neureset::startButtonPressed(){
@@ -127,7 +132,15 @@ void Neureset::stopButtonPressed(){
     sessionsPaused = false;
     sessionStopped = true;
 
+    //stop the session timer, as well as the diconnect and pause timers (we no longer want the device to shut off after 10 seconds since the user is no longger in a session)
     sessionTimer->stop();
+    disconnectTimer->stop();
+    pauseTimer->stop();
+    if(battery > 10){
+        beepTimer->stop();
+    }
+    connectionLight->stopFlashing();
+
     emit updateSessionStopped(sessionStopped);
     //set the session timer on the front end to 0:00
     emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0')));
@@ -145,33 +158,32 @@ void Neureset::selectButtonPressed(){
 }
 
 void Neureset::disconnectButtonPressed(){
-    qInfo("disconnectButtonPressed from neureset class");
-    contact = false;
 
-    //if contact is lost but the user is not currently in a session, we don't need to initate the timer procedure
-    if(inSession){
-        contactLight->setLit(false);
+    contact = false;
+    contactLight->setLit(false);
+
+    //if contact is lost but the user is not currently in a session or if their session is paused, we don't need to initate the timer procedure
+    if(inSession && !sessionsPaused){
+        qInfo("Electrode connection lost. Please reattach electrodes.");
         connectionLight->startFlashing();
         disconnectTimer->start(10000); // 10 seconds
         beepTimer->start(2000);
 
-        //since pauseSession() toggles between paused and not paused, we only want to call it if the session is not already paused. if the session is paused and the user disconnects an electrode, we don't want to resume the session
-        if(!sessionsPaused){
-            pauseSession();
-        }
+        pauseSession();
     }
 }
 
 void Neureset::reconnectButtonPressed(){
-    qInfo("reconnectButtonPressed from neureset class");
 
     contact = true;
+    contactLight->setLit(true);
 
-    if(inSession){
-        contactLight->setLit(true);
+    if(inSession && sessionsPaused){
+        qInfo("Electrode connection regained. Resuming therapy.");
         connectionLight->stopFlashing();
         disconnectTimer->stop();
         beepTimer->stop();
+        pauseTimer->stop();
 
         pauseSession();
     }
@@ -193,9 +205,7 @@ void Neureset::startSession()
 
     contactLight->setLit(contact);
 
-    //float baselineBefore = headset.measureBaseline();
     headset.measureBaseline();
-    //currSession->setBaselineBefore(baselineBefore);
 
     mutex.unlock();
     delete progressThread;
@@ -262,8 +272,6 @@ void Neureset::decreaseBattery(int decreaseAmount) {
     }
 
     mutex.unlock();
-
-    // Potentially update battery level display or trigger low battery warning here
 }
 
 // Method to decrease battery repeatedly after a fixed amoount of seconds

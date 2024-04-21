@@ -21,32 +21,8 @@ EEGHeadset::EEGHeadset(QObject *parent)
 
 EEGHeadset::~EEGHeadset()
 {
-//Clear electrodes here from the main branch
-//    for(int i=0; i<electrodes.size(); ++i){
-//        delete electrodes[i];
-//    }
-//    electrodes.clear();
 
-    //electrode now has headset as parent so they should all get deleted automatically
 }
-
-//Signal processing AND calculating dominant frequency from the signals.
-//Stores the hz for each electrode, and dominant frequency
-//we can comment out this function
-//void EEGHeadset::measureFrequency()
-//{
-//    for (int i = 0; i < electrodes.size(); i++) {
-
-//        //make a new thread and offload the work of this function to said thread
-//        ElectrodeThread* elecThread = new ElectrodeThread(this, electrodes[i]);
-//        QObject::connect(elecThread, &ElectrodeThread::resultReady, this, &EEGHeadset::calculateDominantFreq);
-//        QObject::connect(elecThread, &ElectrodeThread::finished, elecThread, &QObject::deleteLater);
-//        elecThread->start();
-
-//        //QVector<Sinewave> brainwave = electrodes[i]->receiveBrainwave();
-
-//    }
-//}
 
 
 //Finds the average of the dominant frequencies

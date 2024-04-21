@@ -151,6 +151,7 @@ void MainWindow::handleStopButton(){
     ui->stopButton->setEnabled(false);
     ui->pauseButton->setEnabled(false);
     ui->menuButton->setEnabled(true);
+    ui->sessionProgressBar->setValue(0);
     emit stopButtonPressed();
 }
 
@@ -302,9 +303,6 @@ void MainWindow::handleDisconnectButton(){
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
 
-    //control->getNeureset()->getContactLight()->setLit(false);
-    //control->getNeureset()->getConnLight()->startFlashing();
-
     emit disconnectButtonPressed();
 }
 
@@ -313,8 +311,13 @@ void MainWindow::handleReconnectButton(){
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
 
-    //control->getNeureset()->getContactLight()->setLit(true);
-    //control->getNeureset()->getConnLight()->stopFlashing();
+    //if the session is paused, reconnecting the electrodes resumes the session, so we want to disable/enable the appropriate buttonss
+    if(!(ui->pauseButton->isEnabled())){
+        ui->pauseButton->setEnabled(true);
+    }
+    if(ui->startButton->isEnabled()){
+        ui->startButton->setEnabled(false);
+    }
 
     emit reconnectButtonPressed();
 }
@@ -331,9 +334,6 @@ void MainWindow::turnOff(){
     ui->stopButton->setDisabled(true);
     ui->reconnectButton->setDisabled(true);
     ui->reconnectButton->setDisabled(true);
-    //control->getNeureset()->getConnLight()->stopFlashing();
-    //control->getNeureset()->getContactLight()->stopFlashing();
-    //control->getNeureset()->getTSLight()->stopFlashing();
 
     ui->mainMenu->clear();
     ui->sessionFrame->setVisible(false);
