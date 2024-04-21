@@ -50,9 +50,9 @@ private:
     bool power = true;
 
 signals:
-    void menuButtonPressed();
-    void downButtonPressed();
-    void upButtonPressed();
+    //void menuButtonPressed();
+    //void downButtonPressed();
+    //void upButtonPressed();
     void pauseButtonPressed();
     void powerButtonPressed();
     void startButtonPressed();
@@ -66,6 +66,7 @@ public slots:
     void turnOff();
     void sessionComplete();
     void updateGraph(QVector<Sinewave> bWave);
+    void updateBattery(float b);
 
 private slots:
     void handleMenuButton();

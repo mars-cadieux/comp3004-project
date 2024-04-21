@@ -65,7 +65,7 @@ void MainWindow::handleMenuButton(){
     ui->navigateDown->setEnabled(true);
     ui->selectButton->setEnabled(true);
     qInfo()<< "menu button pressed";
-    emit menuButtonPressed();
+    //emit menuButtonPressed();
 }
 
 void MainWindow::handleNavigateDown(){
@@ -80,7 +80,7 @@ void MainWindow::handleNavigateDown(){
     }
 
     qInfo()<< "navigate down button pressed";
-    emit downButtonPressed();
+    //emit downButtonPressed();
 }
 
 void MainWindow::handleNavigateUp(){
@@ -95,7 +95,7 @@ void MainWindow::handleNavigateUp(){
     }
 
     qInfo()<< "navigate up button pressed";
-    emit upButtonPressed();
+    //emit upButtonPressed();
 }
 
 void MainWindow::handlePauseButton(){
@@ -249,7 +249,7 @@ void MainWindow::updateWindow(){
         ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
         ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
         ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
-        ui->batteryBar->setValue(control->getNeureset()->getBattery());
+        //ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();
     }
@@ -295,6 +295,11 @@ void MainWindow::updateGraph(QVector<Sinewave> bWave)
 
         ui->customPlot->replot();
     }
+}
+
+void MainWindow::updateBattery(float b)
+{
+    ui->batteryBar->setValue(b);
 }
 
 void MainWindow::handleDisconnectButton(){

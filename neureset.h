@@ -100,11 +100,14 @@ signals:
     void updateSessionPaused(bool sessionPaused);
     void updateSessionStopped(bool sessionStopped);
     void sendBrainwave(QVector<Sinewave> bWave);
+    void lowBattery();
+    void noBattery();
+    void batteryChanged(float b);
 
 public slots:
-    void menuButtonPressed();
-    void downButtonPressed();
-    void upButtonPressed();
+    //void menuButtonPressed();
+    //void downButtonPressed();
+    //void upButtonPressed();
     void pauseButtonPressed();
     void powerButtonPressed();
     void startButtonPressed();
@@ -119,6 +122,9 @@ public slots:
 
     void updateSessionTime();
     void baselineReceived();
+
+private slots:
+    void startBeepTimer();
 
 private:
     EEGHeadset headset;
