@@ -370,3 +370,8 @@ void Neureset::delay(int seconds)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 }
+
+QVector<Session*>* Neureset::getSessions()
+{
+    return &sessions;
+}

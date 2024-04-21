@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm";
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void updateWindow();

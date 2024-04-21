@@ -87,12 +87,11 @@ public:
     DeviceLight* getConnLight();
     DeviceLight* getContactLight();
     DeviceLight* getTSLight();
+    QVector<Session*>* getSessions();
     void setBattery(int percent);
     QMutex* getMutex();
     float getCurrSessionProgress();
     QString getCurrSessionTime();
-
-
 
 signals:
     void uploadData(QVector<Session*> sessions);

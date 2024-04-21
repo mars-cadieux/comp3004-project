@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->setupUi(this);
     ui->sessionFrame->setVisible(false);
     ui->dateFrame->setVisible(false);
+    ui->historyFrame->setVisible(false);
     ui->mainMenu->setCurrentRow(0);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     ui->reconnectButton->setEnabled(false);
@@ -49,6 +50,7 @@ void MainWindow::handleMenuButton(){
     //Returns to main menu, despite anything that is currently happening. Does not suspend session as of this time.
     ui->sessionFrame->setVisible(false);
     ui->dateFrame->setVisible(false);
+    ui->historyFrame->setVisible(false);
     ui->mainMenu->setVisible(true);
     ui->mainMenu->clear();
     ui->mainMenu->addItem("NEW SESSION");
@@ -167,7 +169,7 @@ void MainWindow::handleSelectButton(){
     {
         ui->mainMenu->clear();
         ui->mainMenu->addItem("UPLOAD");
-        ui->mainMenu->addItem("BACK");
+        ui->mainMenu->addItem("HISTORY");
         ui->mainMenu->setCurrentRow(0);
         ui->menuButton->setEnabled(true);
     }
@@ -179,7 +181,7 @@ void MainWindow::handleSelectButton(){
         ui->dateFrame->setVisible(true);
         ui->menuButton->setEnabled(true);
     }
-    else if(selection == "BACK" || selection == "CONFIRM")
+    else if(selection == "CONFIRM")
     {
         ui->mainMenu->clear();
         ui->mainMenu->addItem("NEW SESSION");
@@ -198,7 +200,17 @@ void MainWindow::handleSelectButton(){
     {
         control->getNeureset()->receiveDataRequest();
     }
+    else if(selection == "HISTORY")
+    {
+        ui->historyList->clear();
 
+        for(int i = 0; i < control->getNeureset()->getSessions()->size(); i ++)
+        {
+            ui->historyList->addItem(control->getNeureset()->getSessions()->at(i)->getDateTime().toString(DATE_FORMAT));
+        }
+
+        ui->historyFrame->setVisible(true);
+    }
 
     qInfo()<< "select button pressed";
     emit selectButtonPressed();
