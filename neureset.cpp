@@ -10,10 +10,11 @@ Neureset::Neureset()
     sessionTime = 0;
 
     //timer to decrease battery life by 1 percent every 10 seconds
-    //batteryTimer = new QTimer(this);
+    batteryTimer = new QTimer(this);
     disconnectTimer = new QTimer(this);
     beepTimer = new QTimer(this);
     sessionTimer = new QTimer(this);
+    pauseTimer = new QTimer(this);
 
     //create a thread for updating the battery so it can be done concurrently alongside other processes
     batteryThread = QThread::create([this]{ decreaseBatteryByTime(); });
@@ -28,7 +29,8 @@ Neureset::Neureset()
     connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
     connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
     connect(sessionTimer, &QTimer::timeout, this, &Neureset::updateSessionTime);
-    //batteryTimer->start(10000); // 10 seconds
+    connect(pauseTimer, &QTimer::timeout, this, &Neureset::shutDown);
+    batteryTimer->start(10000); // 10 seconds
     contact = true;
     power = true;
 
@@ -65,6 +67,7 @@ void Neureset::pauseButtonPressed(){
     qInfo("pauseButtonPressed from neureset class");
     sessionsPaused = true;
     sessionTimer->stop();
+    pauseTimer->start(10000);
     emit updateSessionPaused(sessionsPaused);
 }
 
@@ -77,7 +80,7 @@ void Neureset::pauseSession(){
     }
     else
     {
-        sessionTimer->start();
+        sessionTimer->start(10);
     }
 
     emit updateSessionPaused(sessionsPaused);
@@ -85,6 +88,12 @@ void Neureset::pauseSession(){
 
 void Neureset::powerButtonPressed(){
     power = !power;
+
+    if(!power)
+    {
+        shutDown();
+    }
+
     qInfo("powerButtonPressed from neureset class");
 }
 
@@ -97,6 +106,7 @@ void Neureset::startButtonPressed(){
         sessionStopped = false;
         sessionTimer->start();
         emit updateSessionPaused(sessionsPaused);
+        pauseTimer->stop();
         mutex.unlock();
         return;
     }
@@ -111,6 +121,7 @@ void Neureset::startButtonPressed(){
 void Neureset::stopButtonPressed(){
     mutex.lock();
     qInfo("stopButtonPressed from neureset class");
+    sessionsPaused = false;
     sessionStopped = true;
 
     sessionTimer->stop();
@@ -236,11 +247,33 @@ void Neureset::decreaseBatteryByTime() {
 
 void Neureset::shutDown()
 {
+    mutex.lock();
+
     eraseSessionData();
     power = false;
-    //batteryTimer->stop();
-    //beepTimer->stop();
-    //disconnectTimer->stop();
+
+    if(beepTimer->isActive())
+    {
+        beepTimer->stop();
+    }
+    if(disconnectTimer->isActive())
+    {
+        disconnectTimer->stop();
+    }
+    if(pauseTimer->isActive())
+    {
+        pauseTimer->stop();
+    }
+
+    sessionsPaused = false;
+    sessionStopped = true;
+    sessionTimer->stop();
+    sessionTime = 0;
+
+    emit updateSessionStopped(sessionStopped);
+    progressThread->requestInterruption(); // stop progress thread
+    mutex.unlock();
+
     emit connectionLost();
 }
 
@@ -321,6 +354,9 @@ void Neureset::baselineReceived()
     }
     //otherwise, we have just calculated the final baseline. store received baseline in the afterBaseline variable and finish the session
     else if (baselines.size() == 5){
+
+        progressThread->requestInterruption(); // stop progress thread
+
         //decrease battery by 10% every session
         decreaseBattery(10);
 
@@ -331,7 +367,6 @@ void Neureset::baselineReceived()
         mutex.unlock();
 
         //session is now done, top off progress to 100%
-        progressThread->requestInterruption();
         updateProgress(100);
 
         sessionTimer->stop();

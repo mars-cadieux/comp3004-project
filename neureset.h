@@ -137,6 +137,7 @@ private:
     QTimer* disconnectTimer;
     QTimer* beepTimer;
     QTimer* sessionTimer;
+    QTimer* pauseTimer;
     int sessionTime;
     bool contact;
     bool power;

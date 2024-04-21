@@ -61,6 +61,9 @@ void MainWindow::handleMenuButton(){
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(false);
+    ui->navigateUp->setEnabled(true);
+    ui->navigateDown->setEnabled(true);
+    ui->selectButton->setEnabled(true);
     qInfo()<< "menu button pressed";
     emit menuButtonPressed();
 }
@@ -120,7 +123,14 @@ void MainWindow::handlePowerButton(){
         ui->mainMenu->addItem("TIME AND DATE");
         ui->mainMenu->setCurrentRow(0);
         ui->disconnectButton->setDisabled(false);
+        ui->startButton->setEnabled(false);
+        ui->pauseButton->setEnabled(false);
+        ui->stopButton->setEnabled(false);
+        ui->menuButton->setEnabled(false);
         ui->reconnectButton->setDisabled(true);
+        ui->navigateUp->setEnabled(true);
+        ui->navigateDown->setEnabled(true);
+        ui->selectButton->setEnabled(true);
     }else{
         ui->mainMenu->clear();
         ui->sessionFrame->setVisible(false);
@@ -164,6 +174,9 @@ void MainWindow::handleSelectButton(){
         ui->sessionFrame->setVisible(true);
         ui->menuButton->setEnabled(true);
         ui->startButton->setEnabled(true);
+        ui->navigateUp->setEnabled(false);
+        ui->navigateDown->setEnabled(false);
+        ui->selectButton->setEnabled(false);
     }
     else if(selection == "SESSION LOG")
     {
@@ -180,6 +193,9 @@ void MainWindow::handleSelectButton(){
         ui->mainMenu->setCurrentRow(0);
         ui->dateFrame->setVisible(true);
         ui->menuButton->setEnabled(true);
+        ui->navigateUp->setEnabled(false);
+        ui->navigateDown->setEnabled(false);
+        ui->selectButton->setEnabled(false);
     }
     else if(selection == "CONFIRM")
     {
@@ -187,6 +203,9 @@ void MainWindow::handleSelectButton(){
         ui->mainMenu->addItem("NEW SESSION");
         ui->mainMenu->addItem("SESSION LOG");
         ui->mainMenu->addItem("TIME AND DATE");
+        ui->navigateUp->setEnabled(true);
+        ui->navigateDown->setEnabled(true);
+        ui->selectButton->setEnabled(true);
         ui->mainMenu->setCurrentRow(0);
         ui->menuButton->setEnabled(false);
 
@@ -203,6 +222,9 @@ void MainWindow::handleSelectButton(){
     else if(selection == "HISTORY")
     {
         ui->historyList->clear();
+        ui->navigateUp->setEnabled(false);
+        ui->navigateDown->setEnabled(false);
+        ui->selectButton->setEnabled(false);
 
         for(int i = 0; i < control->getNeureset()->getSessions()->size(); i ++)
         {
@@ -330,6 +352,7 @@ void MainWindow::sessionComplete()
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(true);
+    ui->customPlot->graph(0)->data()->clear();
 }
 
 void MainWindow::on_showWaveformButton_released()
