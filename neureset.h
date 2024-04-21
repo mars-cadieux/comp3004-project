@@ -122,11 +122,10 @@ public slots:
     float getBattery();
     void beep();
     void waveformRequested(const QString& elecNum);
-
-
     void updateSessionTime();
     void baselineReceived();
     void lightUpdated(bool lit, QString t);
+    void treatmentRoundOver();
 
 private slots:
     void startBeepTimer();
@@ -149,6 +148,7 @@ private:
     QTimer* beepTimer;
     QTimer* sessionTimer;
     QTimer* pauseTimer;
+    QTimer* tsLightTimer;
     int sessionTime;
     bool contact;
     bool power;

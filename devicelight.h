@@ -23,13 +23,14 @@ class DeviceLight : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeviceLight(QObject *parent = nullptr, const QString& t = "");
+    explicit DeviceLight(QObject *parent = nullptr, const QString& t = "", bool l = false);
     ~DeviceLight();
     void startFlashing();
     void stopFlashing();
     void updateLight();
-    bool isLit();
-    bool isFlashing();
+    void setLit(bool l);
+    bool isLit() const;
+    bool isFlashing()const;
 
 signals:
     void lightChanged(bool lit, QString t);

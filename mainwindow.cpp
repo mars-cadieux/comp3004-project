@@ -28,14 +28,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->battery10Button, &QPushButton::clicked, this, &MainWindow::handleBattery10Button);
     connect(ui->battery0Button, &QPushButton::clicked, this, &MainWindow::handleBattery0Button);
 
-    windowThread = QThread::create([this]{ updateWindow(); });
-    windowThread->start();
+    //windowThread = QThread::create([this]{ updateWindow(); });
+    //windowThread->start();
     control->launch();
 
     ui->startButton->setEnabled(false);
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(false);
+
+    ui->connectionLight->setChecked(false);
+    ui->contactLight->setChecked(false);
+    ui->treatmentSignalLight->setChecked(false);
 
     ui->customPlot->addGraph();
 
@@ -332,7 +336,10 @@ void MainWindow::handleDisconnectButton(){
     qInfo()<< "disconnect button pressed";
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
-    control->getNeureset()->getContactLight()->startFlashing();
+
+    control->getNeureset()->getContactLight()->setLit(false);
+    control->getNeureset()->getConnLight()->startFlashing();
+
     emit disconnectButtonPressed();
 }
 
@@ -341,7 +348,10 @@ void MainWindow::handleReconnectButton(){
     qInfo()<< "reconnect button pressed";
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
-    control->getNeureset()->getContactLight()->stopFlashing();
+
+    control->getNeureset()->getContactLight()->setLit(true);
+    control->getNeureset()->getConnLight()->stopFlashing();
+
     emit reconnectButtonPressed();
 }
 
