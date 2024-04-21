@@ -3,9 +3,12 @@
 
 Neureset::Neureset()
 {
-    connectionLight = new DeviceLight(this, "connection");
-    contactLight = new DeviceLight(this, "contact");
-    tsLight = new DeviceLight(this, "ts");
+    contact = true;
+    power = true;
+
+    connectionLight = new DeviceLight(this, "connection", false);
+    contactLight = new DeviceLight(this, "contact", contact);
+    tsLight = new DeviceLight(this, "ts", false);
 
     QObject::connect(connectionLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
     QObject::connect(contactLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
@@ -49,15 +52,7 @@ Neureset::Neureset()
     //create a thread for updating the session progress bar
     progressThread = QThread::create([this]{ updateProgressByTime(); });
 
-
-
-
-
-
-
     batteryTimer->start(10000); // 10 seconds
-    contact = true;
-    power = true;
 
     QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
     connect(this, &Neureset::updateSessionPaused, &headset, &EEGHeadset::recieveSessionPaused);
@@ -70,30 +65,10 @@ Neureset::~Neureset()
         delete sessions[i];
     }
     sessions.clear();
-
-    //we delete the lights because deviceLights are not QObjects, they will not automatically get deleted when neureset gets deleted
-    delete connectionLight;
-    delete contactLight;
-    delete tsLight;
 }
 
 
-//void Neureset::menuButtonPressed(){
-//    qInfo("menuButtonPressed from neureset class");
-//}
-
-//void Neureset::downButtonPressed(){
-//    qInfo("downButtonPressed from neureset class");
-//    //needed to tell neureset which sessions to query when user is scrolling through session log
-//}
-
-//void Neureset::upButtonPressed(){
-//    qInfo("upButtonPressed from neureset class");
-//    //needed to tell neureset which sessions to query when user is scrolling through session log
-//}
-
 void Neureset::pauseButtonPressed(){
-    qInfo("pauseButtonPressed from neureset class");
     sessionsPaused = true;
     sessionTimer->stop();
     pauseTimer->start(10000);
@@ -122,18 +97,15 @@ void Neureset::powerButtonPressed(){
     {
         shutDown();
     }
-
-    qInfo("powerButtonPressed from neureset class");
 }
 
 void Neureset::startButtonPressed(){
     mutex.lock();
-    qInfo("startButtonPressed from neureset class");
     //if session is currently paused, resume it. otherwise, start a new session
     if(sessionsPaused){
         sessionsPaused = false;
         sessionStopped = false;
-        sessionTimer->start();
+        sessionTimer->start(1000);
         emit updateSessionPaused(sessionsPaused);
         pauseTimer->stop();
         mutex.unlock();
@@ -149,7 +121,6 @@ void Neureset::startButtonPressed(){
 
 void Neureset::stopButtonPressed(){
     mutex.lock();
-    qInfo("stopButtonPressed from neureset class");
     sessionsPaused = false;
     sessionStopped = true;
 
@@ -157,13 +128,16 @@ void Neureset::stopButtonPressed(){
     emit updateSessionStopped(sessionStopped);
     //set the session timer on the front end to 0:00
     emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0')));
+    //set the session progress bar on the front end to 0
+    emit progressUpdated(0);
     sessions.pop_back();                // remove current session data
     progressThread->requestInterruption(); // stop progress thread
     mutex.unlock();
 }
 
 void Neureset::selectButtonPressed(){
-    qInfo("selectButtonPressed from neureset class");
+    //qInfo("selectButtonPressed from neureset class");
+    //delete later
 }
 
 void Neureset::disconnectButtonPressed(){
@@ -171,8 +145,10 @@ void Neureset::disconnectButtonPressed(){
     disconnectTimer->start(10000); // 10 seconds
     beepTimer->start(2000);
     contact = false;
-
-    pauseSession();
+    //since pauseSession() toggles between paused and not paused, we only want to call it if the session is not already paused. if the session is paused and the user disconnects an electrode, we don't want to resume the session
+    if(!sessionsPaused){
+        pauseSession();
+    }
 }
 
 void Neureset::reconnectButtonPressed(){

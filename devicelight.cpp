@@ -8,7 +8,6 @@ DeviceLight::DeviceLight(QObject* parent, const QString& t, bool l)
     flashThread = QThread::create([this]{ updateLight(); });
     flashThread->start();
 
-    lit = true;
     flashing = false;
     emit lightChanged(lit, type);
 }
@@ -25,7 +24,7 @@ void DeviceLight::startFlashing()
 void DeviceLight::stopFlashing()
 {
     flashing = false;
-    lit = true;
+    lit = false;
     emit lightChanged(lit, type);
 }
 

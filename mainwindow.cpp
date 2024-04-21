@@ -28,8 +28,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->battery10Button, &QPushButton::clicked, this, &MainWindow::handleBattery10Button);
     connect(ui->battery0Button, &QPushButton::clicked, this, &MainWindow::handleBattery0Button);
 
-    //windowThread = QThread::create([this]{ updateWindow(); });
-    //windowThread->start();
     control->launch();
 
     ui->startButton->setEnabled(false);
@@ -38,11 +36,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->menuButton->setEnabled(false);
 
     ui->connectionLight->setChecked(false);
-    ui->contactLight->setChecked(false);
+    ui->contactLight->setChecked(true);
     ui->treatmentSignalLight->setChecked(false);
 
     ui->customPlot->addGraph();
-
 }
 
 MainWindow::~MainWindow()
@@ -68,8 +65,6 @@ void MainWindow::handleMenuButton(){
     ui->navigateUp->setEnabled(true);
     ui->navigateDown->setEnabled(true);
     ui->selectButton->setEnabled(true);
-    qInfo()<< "menu button pressed";
-    //emit menuButtonPressed();
 }
 
 void MainWindow::handleNavigateDown(){
@@ -82,9 +77,6 @@ void MainWindow::handleNavigateDown(){
     {
         ui->mainMenu->setCurrentRow(ui->mainMenu->currentRow() + 1);
     }
-
-    qInfo()<< "navigate down button pressed";
-    //emit downButtonPressed();
 }
 
 void MainWindow::handleNavigateUp(){
@@ -97,16 +89,12 @@ void MainWindow::handleNavigateUp(){
     {
         ui->mainMenu->setCurrentRow(ui->mainMenu->currentRow() - 1);
     }
-
-    qInfo()<< "navigate up button pressed";
-    //emit upButtonPressed();
 }
 
 void MainWindow::handlePauseButton(){
     // Pauses the session
     ui->startButton->setEnabled(true);
     ui->pauseButton->setEnabled(false);
-    qInfo()<< "pause button pressed";
     emit pauseButtonPressed();
 }
 
@@ -143,7 +131,6 @@ void MainWindow::handlePowerButton(){
         ui->reconnectButton->setEnabled(false);
     }
 
-    qInfo()<< "power button pressed";
     emit powerButtonPressed();
 }
 
@@ -155,13 +142,11 @@ void MainWindow::handleStartButton(){
     ui->pauseButton->setEnabled(true);
     ui->menuButton->setEnabled(false);
 
-    qInfo()<< "start button pressed";
     emit startButtonPressed();
 }
 
 void MainWindow::handleStopButton(){
     //Stops the session
-    qInfo()<< "stop button pressed";
     ui->startButton ->setEnabled(true);
     ui->stopButton->setEnabled(false);
     ui->pauseButton->setEnabled(false);
@@ -240,26 +225,7 @@ void MainWindow::handleSelectButton(){
 
         ui->historyFrame->setVisible(true);
     }
-
-    qInfo()<< "select button pressed";
     emit selectButtonPressed();
-}
-
-void MainWindow::updateWindow(){
-    //Updates the window to refresh UI
-    while(windowThread->isRunning())
-    {
-        control->getNeureset()->getMutex()->lock();
-
-//        ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
-//        ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
-//        ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
-        //ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
-        //ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
-        //ui->batteryBar->setValue(control->getNeureset()->getBattery());
-
-        control->getNeureset()->getMutex()->unlock();
-    }
 }
 
 void MainWindow::updateGraph(QVector<Sinewave> bWave)
@@ -333,7 +299,6 @@ void MainWindow::updateLight(bool l, QString t)
 
 void MainWindow::handleDisconnectButton(){
     // Disconnects the Electrodes, emits signal to neureset
-    qInfo()<< "disconnect button pressed";
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
 
@@ -345,7 +310,6 @@ void MainWindow::handleDisconnectButton(){
 
 void MainWindow::handleReconnectButton(){
     // Reconnects the Electrodes, emits signal to neureset
-    qInfo()<< "reconnect button pressed";
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
 

@@ -40,19 +40,13 @@ public:
     const QString DATE_FORMAT = "yyyy-MM-dd hh:mm";
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void updateWindow();
-
 
 private:
     Ui::MainWindow *ui;
     Controller* control;
-    QThread* windowThread;
     bool power = true;
 
 signals:
-    //void menuButtonPressed();
-    //void downButtonPressed();
-    //void upButtonPressed();
     void pauseButtonPressed();
     void powerButtonPressed();
     void startButtonPressed();
