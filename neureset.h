@@ -93,6 +93,7 @@ public:
     float getCurrSessionProgress();
     QString getCurrSessionTime();
 
+
 signals:
     void uploadData(QVector<Session*> sessions);
     void connectionLost();
@@ -100,11 +101,17 @@ signals:
     void updateSessionPaused(bool sessionPaused);
     void updateSessionStopped(bool sessionStopped);
     void sendBrainwave(QVector<Sinewave> bWave);
+    void lowBattery();
+    void noBattery();
+    void batteryChanged(float b);
+    void sessionTimeUpdated(QString s);
+    void progressUpdated(float p);
+    void lightChanged(bool lit, QString t);
 
 public slots:
-    void menuButtonPressed();
-    void downButtonPressed();
-    void upButtonPressed();
+    //void menuButtonPressed();
+    //void downButtonPressed();
+    //void upButtonPressed();
     void pauseButtonPressed();
     void powerButtonPressed();
     void startButtonPressed();
@@ -115,10 +122,13 @@ public slots:
     float getBattery();
     void beep();
     void waveformRequested(const QString& elecNum);
-
-
     void updateSessionTime();
     void baselineReceived();
+    void lightUpdated(bool lit, QString t);
+    void treatmentRoundOver();
+
+private slots:
+    void startBeepTimer();
 
 private:
     EEGHeadset headset;
@@ -138,11 +148,13 @@ private:
     QTimer* beepTimer;
     QTimer* sessionTimer;
     QTimer* pauseTimer;
+    QTimer* tsLightTimer;
     int sessionTime;
     bool contact;
     bool power;
     bool sessionsPaused;
     bool sessionStopped;
+    bool inSession;
     QMutex mutex;
     QThread* batteryThread;
     QThread* progressThread;

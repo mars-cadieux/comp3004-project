@@ -23,7 +23,7 @@ void ElectrodeThread::run()
     }
 
     while(sessionPaused_){
-        qInfo("session paused"); // keep session paused while true
+        //qInfo("session paused"); // keep session paused while true
 
         if(sessionStopped_){     // check if stopped too
             return;

@@ -3,18 +3,50 @@
 
 Neureset::Neureset()
 {
-    connectionLight = new DeviceLight();
-    contactLight = new DeviceLight();
-    tsLight = new DeviceLight();
+    contact = true;
+    power = true;
+    inSession = false;
+
+    currentSession = nullptr;
+
+    connectionLight = new DeviceLight(this, "connection", false);
+    contactLight = new DeviceLight(this, "contact", contact);
+    tsLight = new DeviceLight(this, "ts", false);
+
+    QObject::connect(connectionLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+    QObject::connect(contactLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+    QObject::connect(tsLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+
+
     battery = 100;
     sessionTime = 0;
 
-    //timer to decrease battery life by 1 percent every 10 seconds
+    //instatiate all timers
     batteryTimer = new QTimer(this);
     disconnectTimer = new QTimer(this);
     beepTimer = new QTimer(this);
     sessionTimer = new QTimer(this);
     pauseTimer = new QTimer(this);
+    tsLightTimer = new QTimer(this);
+
+    //connect all timers' timeout signals to the appropriate neureset slots
+    connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
+    connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
+    connect(sessionTimer, &QTimer::timeout, this, &Neureset::updateSessionTime);
+    connect(pauseTimer, &QTimer::timeout, this, &Neureset::shutDown);
+    connect(tsLightTimer, &QTimer::timeout, this, &Neureset::treatmentRoundOver);
+
+    //connect the "no battery" signal to the "stop" slot of all our timers, so they stop when the device shuts down
+    QObject::connect(this, &Neureset::noBattery, batteryTimer, &QTimer::stop);
+    QObject::connect(this, &Neureset::noBattery, disconnectTimer, &QTimer::stop);
+    QObject::connect(this, &Neureset::noBattery, beepTimer, &QTimer::stop);
+    QObject::connect(this, &Neureset::noBattery, sessionTimer, &QTimer::stop);
+    QObject::connect(this, &Neureset::noBattery, pauseTimer, &QTimer::stop);
+    QObject::connect(this, &Neureset::noBattery, tsLightTimer, &QTimer::stop);
+
+    //connect the "low battery" signal to the neureset slot to start the beep timer
+    //we use signals and slots here rather than direct function calls because the low battery stuff happens in its own thread, but the timers run in the main thread
+    QObject::connect(this, &Neureset::lowBattery, this, &Neureset::startBeepTimer);
 
     //create a thread for updating the battery so it can be done concurrently alongside other processes
     batteryThread = QThread::create([this]{ decreaseBatteryByTime(); });
@@ -23,16 +55,7 @@ Neureset::Neureset()
     //create a thread for updating the session progress bar
     progressThread = QThread::create([this]{ updateProgressByTime(); });
 
-
-
-    //connect(batteryTimer, &QTimer::timeout, this, &Neureset::decreaseBatteryByTime);
-    connect(disconnectTimer, &QTimer::timeout, this, &Neureset::shutDown);
-    connect(beepTimer, &QTimer::timeout, this, &Neureset::beep);
-    connect(sessionTimer, &QTimer::timeout, this, &Neureset::updateSessionTime);
-    connect(pauseTimer, &QTimer::timeout, this, &Neureset::shutDown);
     batteryTimer->start(10000); // 10 seconds
-    contact = true;
-    power = true;
 
     QObject::connect(&headset, &EEGHeadset::sendBaseline, this, &Neureset::baselineReceived);
     connect(this, &Neureset::updateSessionPaused, &headset, &EEGHeadset::recieveSessionPaused);
@@ -45,26 +68,11 @@ Neureset::~Neureset()
         delete sessions[i];
     }
     sessions.clear();
-
 }
 
-
-void Neureset::menuButtonPressed(){
-    qInfo("menuButtonPressed from neureset class");
-}
-
-void Neureset::downButtonPressed(){
-    qInfo("downButtonPressed from neureset class");
-    //needed to tell neureset which sessions to query when user is scrolling through session log
-}
-
-void Neureset::upButtonPressed(){
-    qInfo("upButtonPressed from neureset class");
-    //needed to tell neureset which sessions to query when user is scrolling through session log
-}
 
 void Neureset::pauseButtonPressed(){
-    qInfo("pauseButtonPressed from neureset class");
+    qInfo("Session paused. Device will shut off after 10 seconds of inactivity.");
     sessionsPaused = true;
     sessionTimer->stop();
     pauseTimer->start(10000);
@@ -80,7 +88,7 @@ void Neureset::pauseSession(){
     }
     else
     {
-        sessionTimer->start(10);
+        sessionTimer->start(1000);
     }
 
     emit updateSessionPaused(sessionsPaused);
@@ -93,18 +101,19 @@ void Neureset::powerButtonPressed(){
     {
         shutDown();
     }
-
-    qInfo("powerButtonPressed from neureset class");
+    else{
+        contact = true;
+        contactLight->setLit(contact);
+    }
 }
 
 void Neureset::startButtonPressed(){
     mutex.lock();
-    qInfo("startButtonPressed from neureset class");
-    //add handling so that this function only starts the session if "new session" is currently selected
+    //if session is currently paused, resume it. otherwise, start a new session
     if(sessionsPaused){
         sessionsPaused = false;
         sessionStopped = false;
-        sessionTimer->start();
+        sessionTimer->start(1000);
         emit updateSessionPaused(sessionsPaused);
         pauseTimer->stop();
         mutex.unlock();
@@ -120,42 +129,70 @@ void Neureset::startButtonPressed(){
 
 void Neureset::stopButtonPressed(){
     mutex.lock();
-    qInfo("stopButtonPressed from neureset class");
     sessionsPaused = false;
     sessionStopped = true;
 
+    //stop the session timer, as well as the diconnect and pause timers (we no longer want the device to shut off after 10 seconds since the user is no longger in a session)
     sessionTimer->stop();
+    disconnectTimer->stop();
+    pauseTimer->stop();
+    if(battery > 10){
+        beepTimer->stop();
+    }
+    connectionLight->stopFlashing();
+
     emit updateSessionStopped(sessionStopped);
+    //set the session timer on the front end to 0:00
+    emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0')));
+    //set the session progress bar on the front end to 0
+    emit progressUpdated(0);
     sessions.pop_back();                // remove current session data
+    inSession = false;
     progressThread->requestInterruption(); // stop progress thread
     mutex.unlock();
 }
 
 void Neureset::selectButtonPressed(){
-    qInfo("selectButtonPressed from neureset class");
+    //qInfo("selectButtonPressed from neureset class");
+    //delete later
 }
 
 void Neureset::disconnectButtonPressed(){
-    qInfo("disconnectButtonPressed from neureset class");
-    disconnectTimer->start(10000); // 10 seconds
-    beepTimer->start(2000);
-    contact = false;
 
-    pauseSession();
+    contact = false;
+    contactLight->setLit(false);
+
+    //if contact is lost but the user is not currently in a session or if their session is paused, we don't need to initate the timer procedure
+    if(inSession && !sessionsPaused){
+        qInfo("Electrode connection lost. Please reattach electrodes.");
+        connectionLight->startFlashing();
+        disconnectTimer->start(10000); // 10 seconds
+        beepTimer->start(2000);
+
+        pauseSession();
+    }
 }
 
 void Neureset::reconnectButtonPressed(){
-    qInfo("reconnectButtonPressed from neureset class");
-    disconnectTimer->stop();
-    beepTimer->stop();
-    contact = true;
 
-    pauseSession();
+    contact = true;
+    contactLight->setLit(true);
+
+    if(inSession && sessionsPaused){
+        qInfo("Electrode connection regained. Resuming therapy.");
+        connectionLight->stopFlashing();
+        disconnectTimer->stop();
+        beepTimer->stop();
+        pauseTimer->stop();
+
+        pauseSession();
+    }
 }
 
 void Neureset::startSession()
 {
     mutex.lock();
+    inSession = true;
 
     baselines.clear();
 
@@ -166,9 +203,9 @@ void Neureset::startSession()
 
     currentSession->setDateTime(dateTime);
 
-    //float baselineBefore = headset.measureBaseline();
+    contactLight->setLit(contact);
+
     headset.measureBaseline();
-    //currSession->setBaselineBefore(baselineBefore);
 
     mutex.unlock();
     delete progressThread;
@@ -214,31 +251,33 @@ void Neureset::decreaseBattery(int decreaseAmount) {
     if(power)
     {
         battery -= decreaseAmount;
+        emit batteryChanged(battery);
+        //display the low battery message only once, when battery is at 10%
+        if(battery==10){
+            qInfo("Low battery. Please charge the device.");
+        }
 
         if(battery > 0 && battery <= 10 && !connectionLight->isFlashing())
         {
             connectionLight->startFlashing();
-            beepTimer->start(2000);
+            emit lowBattery();
         }
         else if(battery <= 0)
         {
             battery = 0;
-            beepTimer->stop();
-            disconnectTimer->stop();
+            batteryThread->requestInterruption();
             mutex.unlock();
             shutDown();
         }
     }
 
     mutex.unlock();
-
-    // Potentially update battery level display or trigger low battery warning here
 }
 
-// Method to decrease battery because of time
+// Method to decrease battery repeatedly after a fixed amoount of seconds
 void Neureset::decreaseBatteryByTime() {
 
-    while(batteryThread->isRunning())
+    while(batteryThread->isRunning() && !batteryThread->isInterruptionRequested())
     {
         batteryThread->sleep(5);
         decreaseBattery(1);
@@ -248,31 +287,24 @@ void Neureset::decreaseBatteryByTime() {
 void Neureset::shutDown()
 {
     mutex.lock();
+    emit noBattery();
 
     eraseSessionData();
     power = false;
-
-    if(beepTimer->isActive())
-    {
-        beepTimer->stop();
-    }
-    if(disconnectTimer->isActive())
-    {
-        disconnectTimer->stop();
-    }
-    if(pauseTimer->isActive())
-    {
-        pauseTimer->stop();
-    }
+    inSession = false;
 
     sessionsPaused = false;
     sessionStopped = true;
-    sessionTimer->stop();
     sessionTime = 0;
+
+    connectionLight->stopFlashing();
+    contactLight->stopFlashing();
+    tsLight->stopFlashing();
 
     emit updateSessionStopped(sessionStopped);
     progressThread->requestInterruption(); // stop progress thread
     mutex.unlock();
+    qInfo("Device shutting down.");
 
     emit connectionLost();
 }
@@ -285,6 +317,8 @@ void Neureset::eraseSessionData()
 void Neureset::updateProgress(int prog)
 {
     currentSession->updateProgress(prog);
+    //emit signal to main window to update progress bar on front-end
+    emit progressUpdated(currentSession->getProgress());
 }
 
 void Neureset::updateProgressByTime()
@@ -304,6 +338,10 @@ void Neureset::updateProgressByTime()
 void Neureset::updateSessionTime()
 {
     sessionTime += 1;
+
+    int seconds = sessionTime % 60;
+    int minutes = (sessionTime - seconds) / 60;
+    emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0')));
 }
 
 QString Neureset::getCurrSessionTime()
@@ -317,6 +355,17 @@ QString Neureset::getCurrSessionTime()
 
     return QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0'));
 }
+
+void Neureset::lightUpdated(bool lit, QString t)
+{
+    emit lightChanged(lit, t);
+}
+
+void Neureset::treatmentRoundOver()
+{
+    tsLight->setLit(false);
+}
+
 
 void Neureset::beep()
 {
@@ -347,7 +396,10 @@ void Neureset::baselineReceived()
 
         //do the treatment
         qInfo("\nTreatment round %d ",i);
+        tsLight->setLit(true);
+        tsLightTimer->start(1000);
         headset.beginTreatment(i);
+
 
         //measure the baseline for the next round
         headset.measureBaseline();
@@ -372,7 +424,13 @@ void Neureset::baselineReceived()
         sessionTimer->stop();
 
         emit sessionComplete();
+        inSession = false;
     }
+}
+
+void Neureset::startBeepTimer()
+{
+    beepTimer->start(2000);
 }
 
 

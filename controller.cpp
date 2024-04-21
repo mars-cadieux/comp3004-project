@@ -7,15 +7,11 @@ Controller::Controller(MainWindow* w, QObject *parent)
     window = w;
 }
 Controller::~Controller(){
-    //I think QObjects delete all their children so we don't need to delete mainwindow and neureset, I could be wrong tho
+
 }
 
 void Controller::launch(){
     //connect all of the button press signals from main window to neureset slots
-    //these slots will eventually be replaced by the functions that actually handle the functionality (startSession etc), I just gave them the same name for now so it's easy to read/track
-    QObject::connect(window, &MainWindow::menuButtonPressed, &neureset, &Neureset::menuButtonPressed);
-    QObject::connect(window, &MainWindow::downButtonPressed, &neureset, &Neureset::downButtonPressed);
-    QObject::connect(window, &MainWindow::upButtonPressed, &neureset, &Neureset::upButtonPressed);
     QObject::connect(window, &MainWindow::pauseButtonPressed, &neureset, &Neureset::pauseButtonPressed);
     QObject::connect(window, &MainWindow::powerButtonPressed, &neureset, &Neureset::powerButtonPressed);
     QObject::connect(window, &MainWindow::startButtonPressed, &neureset, &Neureset::startButtonPressed);
@@ -30,6 +26,12 @@ void Controller::launch(){
 
     QObject::connect(&neureset, &Neureset::connectionLost, window, &MainWindow::turnOff);
     QObject::connect(&neureset, &Neureset::sessionComplete, window, &MainWindow::sessionComplete);
+
+    //connect signals and slots for updating widgets such as battery bar, progress bar, etc
+    QObject::connect(&neureset, &Neureset::batteryChanged, window, &MainWindow::updateBattery);
+    QObject::connect(&neureset, &Neureset::sessionTimeUpdated, window, &MainWindow::updateSessionTimer);
+    QObject::connect(&neureset, &Neureset::progressUpdated, window, &MainWindow::updateSessionProgress);
+    QObject::connect(&neureset, &Neureset::lightChanged, window, &MainWindow::updateLight);
 
     //connect the necessary signals/slots between the PCSoftware and Neureset classes
     QObject::connect(&neureset, &Neureset::uploadData, &pcSoft, &PCSoftware::downloadData);
