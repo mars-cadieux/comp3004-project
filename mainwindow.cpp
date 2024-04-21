@@ -257,6 +257,11 @@ void MainWindow::updateWindow(){
 
 void MainWindow::updateGraph(QVector<Sinewave> bWave)
 {
+    if(ui->customPlot->graphCount() == 0)
+    {
+        ui->customPlot->addGraph();
+    }
+
     //if the electrode has measured a brainwave, the bWave vector will be non-empty and we want to update the graph. Otherwise, do nothing
     if(bWave.size() > 0){
 
@@ -352,7 +357,7 @@ void MainWindow::sessionComplete()
     ui->pauseButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->menuButton->setEnabled(true);
-    ui->customPlot->graph(0)->data()->clear();
+    ui->customPlot->removeGraph(0);
 }
 
 void MainWindow::on_showWaveformButton_released()
