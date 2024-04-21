@@ -154,6 +154,7 @@ private:
     bool power;
     bool sessionsPaused;
     bool sessionStopped;
+    bool inSession;
     QMutex mutex;
     QThread* batteryThread;
     QThread* progressThread;

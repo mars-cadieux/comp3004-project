@@ -5,6 +5,9 @@ Neureset::Neureset()
 {
     contact = true;
     power = true;
+    inSession = false;
+
+    currentSession = nullptr;
 
     connectionLight = new DeviceLight(this, "connection", false);
     contactLight = new DeviceLight(this, "contact", contact);
@@ -84,7 +87,7 @@ void Neureset::pauseSession(){
     }
     else
     {
-        sessionTimer->start(10);
+        sessionTimer->start(1000);
     }
 
     emit updateSessionPaused(sessionsPaused);
@@ -131,6 +134,7 @@ void Neureset::stopButtonPressed(){
     //set the session progress bar on the front end to 0
     emit progressUpdated(0);
     sessions.pop_back();                // remove current session data
+    inSession = false;
     progressThread->requestInterruption(); // stop progress thread
     mutex.unlock();
 }
@@ -142,27 +146,41 @@ void Neureset::selectButtonPressed(){
 
 void Neureset::disconnectButtonPressed(){
     qInfo("disconnectButtonPressed from neureset class");
-    disconnectTimer->start(10000); // 10 seconds
-    beepTimer->start(2000);
     contact = false;
-    //since pauseSession() toggles between paused and not paused, we only want to call it if the session is not already paused. if the session is paused and the user disconnects an electrode, we don't want to resume the session
-    if(!sessionsPaused){
-        pauseSession();
+
+    //if contact is lost but the user is not currently in a session, we don't need to initate the timer procedure
+    if(inSession){
+        contactLight->setLit(false);
+        connectionLight->startFlashing();
+        disconnectTimer->start(10000); // 10 seconds
+        beepTimer->start(2000);
+
+        //since pauseSession() toggles between paused and not paused, we only want to call it if the session is not already paused. if the session is paused and the user disconnects an electrode, we don't want to resume the session
+        if(!sessionsPaused){
+            pauseSession();
+        }
     }
 }
 
 void Neureset::reconnectButtonPressed(){
     qInfo("reconnectButtonPressed from neureset class");
-    disconnectTimer->stop();
-    beepTimer->stop();
+
     contact = true;
 
-    pauseSession();
+    if(inSession){
+        contactLight->setLit(true);
+        connectionLight->stopFlashing();
+        disconnectTimer->stop();
+        beepTimer->stop();
+
+        pauseSession();
+    }
 }
 
 void Neureset::startSession()
 {
     mutex.lock();
+    inSession = true;
 
     baselines.clear();
 
@@ -265,10 +283,15 @@ void Neureset::shutDown()
 
     eraseSessionData();
     power = false;
+    inSession = false;
 
     sessionsPaused = false;
     sessionStopped = true;
     sessionTime = 0;
+
+    connectionLight->stopFlashing();
+    contactLight->stopFlashing();
+    tsLight->stopFlashing();
 
     emit updateSessionStopped(sessionStopped);
     progressThread->requestInterruption(); // stop progress thread
@@ -393,6 +416,7 @@ void Neureset::baselineReceived()
         sessionTimer->stop();
 
         emit sessionComplete();
+        inSession = false;
     }
 }
 

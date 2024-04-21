@@ -302,8 +302,8 @@ void MainWindow::handleDisconnectButton(){
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
 
-    control->getNeureset()->getContactLight()->setLit(false);
-    control->getNeureset()->getConnLight()->startFlashing();
+    //control->getNeureset()->getContactLight()->setLit(false);
+    //control->getNeureset()->getConnLight()->startFlashing();
 
     emit disconnectButtonPressed();
 }
@@ -313,8 +313,8 @@ void MainWindow::handleReconnectButton(){
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
 
-    control->getNeureset()->getContactLight()->setLit(true);
-    control->getNeureset()->getConnLight()->stopFlashing();
+    //control->getNeureset()->getContactLight()->setLit(true);
+    //control->getNeureset()->getConnLight()->stopFlashing();
 
     emit reconnectButtonPressed();
 }
@@ -331,9 +331,9 @@ void MainWindow::turnOff(){
     ui->stopButton->setDisabled(true);
     ui->reconnectButton->setDisabled(true);
     ui->reconnectButton->setDisabled(true);
-    control->getNeureset()->getConnLight()->stopFlashing();
-    control->getNeureset()->getContactLight()->stopFlashing();
-    control->getNeureset()->getTSLight()->stopFlashing();
+    //control->getNeureset()->getConnLight()->stopFlashing();
+    //control->getNeureset()->getContactLight()->stopFlashing();
+    //control->getNeureset()->getTSLight()->stopFlashing();
 
     ui->mainMenu->clear();
     ui->sessionFrame->setVisible(false);
