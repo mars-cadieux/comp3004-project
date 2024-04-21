@@ -33,6 +33,9 @@ void Controller::launch(){
 
     //connect signals and slots for updating widgets such as battery bar, progress bar, etc
     QObject::connect(&neureset, &Neureset::batteryChanged, window, &MainWindow::updateBattery);
+    QObject::connect(&neureset, &Neureset::sessionTimeUpdated, window, &MainWindow::updateSessionTimer);
+    QObject::connect(&neureset, &Neureset::progressUpdated, window, &MainWindow::updateSessionProgress);
+    QObject::connect(&neureset, &Neureset::lightChanged, window, &MainWindow::updateLight);
 
     //connect the necessary signals/slots between the PCSoftware and Neureset classes
     QObject::connect(&neureset, &Neureset::uploadData, &pcSoft, &PCSoftware::downloadData);

@@ -93,6 +93,7 @@ public:
     float getCurrSessionProgress();
     QString getCurrSessionTime();
 
+
 signals:
     void uploadData(QVector<Session*> sessions);
     void connectionLost();
@@ -103,6 +104,9 @@ signals:
     void lowBattery();
     void noBattery();
     void batteryChanged(float b);
+    void sessionTimeUpdated(QString s);
+    void progressUpdated(float p);
+    void lightChanged(bool lit, QString t);
 
 public slots:
     //void menuButtonPressed();
@@ -122,6 +126,7 @@ public slots:
 
     void updateSessionTime();
     void baselineReceived();
+    void lightUpdated(bool lit, QString t);
 
 private slots:
     void startBeepTimer();

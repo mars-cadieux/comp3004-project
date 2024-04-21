@@ -177,6 +177,9 @@ void MainWindow::handleSelectButton(){
         ui->navigateUp->setEnabled(false);
         ui->navigateDown->setEnabled(false);
         ui->selectButton->setEnabled(false);
+
+        ui->sessionProgressBar->setValue(0);
+        ui->timerDisplay->setText(QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0')));
     }
     else if(selection == "SESSION LOG")
     {
@@ -244,11 +247,11 @@ void MainWindow::updateWindow(){
     {
         control->getNeureset()->getMutex()->lock();
 
-        ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
-        ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
-        ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
-        ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
-        ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
+//        ui->contactLight->setChecked(control->getNeureset()->getContactLight()->isLit());
+//        ui->treatmentSignalLight->setChecked(control->getNeureset()->getTSLight()->isLit());
+//        ui->connectionLight->setChecked(control->getNeureset()->getConnLight()->isLit());
+        //ui->sessionProgressBar->setValue(control->getNeureset()->getCurrSessionProgress());
+        //ui->timerDisplay->setText(control->getNeureset()->getCurrSessionTime());
         //ui->batteryBar->setValue(control->getNeureset()->getBattery());
 
         control->getNeureset()->getMutex()->unlock();
@@ -279,8 +282,6 @@ void MainWindow::updateGraph(QVector<Sinewave> bWave)
           //the EEG waveform will be the sum of all four brainwaves (alpha, beta, delta, theta). loop through all brainwaves and sum their values
           //recall that the formula for a sinwave (in terms of i) is (amplitude)*(sin((frequency)*i))
           for(int j=0; j<bWave.size(); ++j){
-              //qInfo("Amp: %f", bWave[j].amplitude); //debugging
-              //qInfo("Freq: %f", bWave[j].frequency); //debugging
               temp += (bWave[j].amplitude)*qSin((bWave[j].frequency)*i);
           }
           y[i] = temp;
@@ -302,12 +303,36 @@ void MainWindow::updateBattery(float b)
     ui->batteryBar->setValue(b);
 }
 
+void MainWindow::updateSessionTimer(QString t)
+{
+    ui->timerDisplay->setText(t);
+}
+
+void MainWindow::updateSessionProgress(float p)
+{
+    ui->sessionProgressBar->setValue(p);
+}
+
+void MainWindow::updateLight(bool l, QString t)
+{
+    //qInfo("in updatelight main window"); //debugging
+    if(QString::compare(t, "contact") == 0){
+        ui->contactLight->setChecked(l);
+    }
+    else if(QString::compare(t, "connection") == 0){
+        ui->connectionLight->setChecked(l);
+    }
+    else if(QString::compare(t, "ts") == 0){
+        ui->treatmentSignalLight->setChecked(l);
+    }
+}
+
 void MainWindow::handleDisconnectButton(){
     // Disconnects the Electrodes, emits signal to neureset
     qInfo()<< "disconnect button pressed";
     ui->disconnectButton->setEnabled(false);
     ui->reconnectButton->setEnabled(true);
-    control->getNeureset()->getConnLight()->startFlashing();
+    control->getNeureset()->getContactLight()->startFlashing();
     emit disconnectButtonPressed();
 }
 
@@ -316,7 +341,7 @@ void MainWindow::handleReconnectButton(){
     qInfo()<< "reconnect button pressed";
     ui->reconnectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);
-    control->getNeureset()->getConnLight()->stopFlashing();
+    control->getNeureset()->getContactLight()->stopFlashing();
     emit reconnectButtonPressed();
 }
 

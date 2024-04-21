@@ -1,12 +1,21 @@
 #include "devicelight.h"
+#include "neureset.h"
 
-DeviceLight::DeviceLight()
+DeviceLight::DeviceLight(QObject* parent, const QString& t)
+    : QObject{parent}
 {
+    type = t;
     flashThread = QThread::create([this]{ updateLight(); });
     flashThread->start();
 
     lit = true;
     flashing = false;
+    emit lightChanged(lit, type);
+}
+
+DeviceLight::~DeviceLight()
+{
+
 }
 
 void DeviceLight::startFlashing()
@@ -16,6 +25,8 @@ void DeviceLight::startFlashing()
 void DeviceLight::stopFlashing()
 {
     flashing = false;
+    lit = true;
+    emit lightChanged(lit, type);
 }
 
 void DeviceLight::updateLight()
@@ -26,6 +37,7 @@ void DeviceLight::updateLight()
         if(flashing)
         {
             lit = !lit;
+            emit lightChanged(lit, type);
         }
         else
         {

@@ -3,9 +3,15 @@
 
 Neureset::Neureset()
 {
-    connectionLight = new DeviceLight();
-    contactLight = new DeviceLight();
-    tsLight = new DeviceLight();
+    connectionLight = new DeviceLight(this, "connection");
+    contactLight = new DeviceLight(this, "contact");
+    tsLight = new DeviceLight(this, "ts");
+
+    QObject::connect(connectionLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+    QObject::connect(contactLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+    QObject::connect(tsLight, &DeviceLight::lightChanged, this, &Neureset::lightUpdated);
+
+
     battery = 100;
     sessionTime = 0;
 
@@ -54,6 +60,10 @@ Neureset::~Neureset()
     }
     sessions.clear();
 
+    //we delete the lights because deviceLights are not QObjects, they will not automatically get deleted when neureset gets deleted
+    delete connectionLight;
+    delete contactLight;
+    delete tsLight;
 }
 
 
@@ -134,6 +144,8 @@ void Neureset::stopButtonPressed(){
 
     sessionTimer->stop();
     emit updateSessionStopped(sessionStopped);
+    //set the session timer on the front end to 0:00
+    emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0')));
     sessions.pop_back();                // remove current session data
     progressThread->requestInterruption(); // stop progress thread
     mutex.unlock();
@@ -239,7 +251,7 @@ void Neureset::decreaseBattery(int decreaseAmount) {
             battery = 0;
             //beepTimer->stop();
             //disconnectTimer->stop();
-            emit noBattery();
+            //emit noBattery();
             mutex.unlock();
             shutDown();
         }
@@ -263,6 +275,7 @@ void Neureset::decreaseBatteryByTime() {
 void Neureset::shutDown()
 {
     mutex.lock();
+    emit noBattery();
 
     eraseSessionData();
     power = false;
@@ -304,6 +317,8 @@ void Neureset::eraseSessionData()
 void Neureset::updateProgress(int prog)
 {
     currentSession->updateProgress(prog);
+    //emit signal to main window to update progress bar on front-end
+    emit progressUpdated(currentSession->getProgress());
 }
 
 void Neureset::updateProgressByTime()
@@ -323,6 +338,10 @@ void Neureset::updateProgressByTime()
 void Neureset::updateSessionTime()
 {
     sessionTime += 1;
+
+    int seconds = sessionTime % 60;
+    int minutes = (sessionTime - seconds) / 60;
+    emit sessionTimeUpdated(QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0')));
 }
 
 QString Neureset::getCurrSessionTime()
@@ -336,6 +355,12 @@ QString Neureset::getCurrSessionTime()
 
     return QStringLiteral("%1:%2").arg(0).arg(0, 2, 10, QLatin1Char('0'));
 }
+
+void Neureset::lightUpdated(bool lit, QString t)
+{
+    emit lightChanged(lit, t);
+}
+
 
 void Neureset::beep()
 {

@@ -67,6 +67,9 @@ public slots:
     void sessionComplete();
     void updateGraph(QVector<Sinewave> bWave);
     void updateBattery(float b);
+    void updateSessionTimer(QString t);
+    void updateSessionProgress(float p);
+    void updateLight(bool l, QString t);
 
 private slots:
     void handleMenuButton();
